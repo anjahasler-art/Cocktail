@@ -8,61 +8,80 @@
 </head>
 <body>
 
-  <form id="cocktailForm" onsubmit="return false;">
+  <main class="main-container">
+    <form id="cocktailForm" onsubmit="return false;">
 
-    <!-- ==================== SCHRITT 1 ==================== -->
-    <div id="step1" class="step">
-      <h2>Schritt 1: Suchart wählen</h2>
+      <!-- ==================== SCHRITT 1 ==================== -->
+      <div id="step1" class="step">
+        <h2>Schritt 1: Suchart wählen</h2>
 
-      <!-- Dropdown bestimmt, welches Input-Feld gezeigt wird -->
-      <label>Suchen nach:</label>
-      <select id="searchType">
-        <option value="name">Cocktailname</option>
-        <option value="ingredient">Hauptzutat</option>
-      </select>
+        <!-- Dropdown bestimmt, welches Input-Feld gezeigt wird -->
+        <label for="searchType">Suchen nach:</label>
+        <select id="searchType">
+          <option value="name">Cocktailname</option>
+          <option value="ingredient">Hauptzutat</option>
+        </select>
 
-      <!-- Eingabefeld A: Name -->
-      <div id="groupName">
-        <label>Name:</label>
-        <input type="text" id="inputName" placeholder="z. B. Margarita">
+        <!-- Eingabefeld A: Name -->
+        <div id="groupName">
+          <label for="inputName">Name:</label>
+          <input 
+            type="text" 
+            id="inputName" 
+            placeholder="z. B. French 75"
+            aria-describedby="feedbackText nameHint"
+            aria-invalid="false"
+          >
+          <small id="nameHint" class="hint-text">Buchstaben und Zahlen sind gültig (2–30 Zeichen).</small>
+        </div>
+
+        <!-- Eingabefeld B: Zutat (startet ausgeblendet) -->
+        <div id="groupIngredient" class="hidden">
+          <label for="inputIngredient">Zutat:</label>
+          <input 
+            type="text" 
+            id="inputIngredient" 
+            placeholder="z. B. Gin"
+            aria-describedby="feedbackText ingredientHint"
+            aria-invalid="false"
+          >
+          <small id="ingredientHint" class="hint-text">Buchstaben und Zahlen sind gültig (2–30 Zeichen).</small>
+        </div>
+
+        <!-- Text für barrierefreies Validierungs-Feedback -->
+        <p id="feedbackText" role="alert" aria-live="polite"></p>
+
+        <button type="button" id="btnStep1">Weiter</button>
       </div>
 
-      <!-- Eingabefeld B: Zutat (startet ausgeblendet) -->
-      <div id="groupIngredient" class="hidden">
-        <label>Zutat:</label>
-        <input type="text" id="inputIngredient" placeholder="z. B. Gin">
+      <!-- ==================== SCHRITT 2 ==================== -->
+      <div id="step2" class="step hidden">
+        <h2>Schritt 2: Cocktail auswählen</h2>
+
+        <!-- Dropdown für die API-Ergebnisse -->
+        <label for="resultsSelect">Ergebnisliste:</label>
+        <select id="resultsSelect">
+          <option value="">-- Bitte wählen --</option>
+        </select>
+
+        <div class="button-group">
+          <button type="button" id="btnBackTo1" class="btn-secondary">Zurück</button>
+          <button type="button" id="btnStep2">Rezept anzeigen</button>
+        </div>
       </div>
 
-      <!-- Text für Validierungs-Feedback -->
-      <p id="feedbackText"></p>
+      <!-- ==================== SCHRITT 3 ==================== -->
+      <div id="step3" class="step hidden">
+        <h2>Schritt 3: Rezept</h2>
+        
+        <!-- Hier fügt JS das fertige Ergebnis ein -->
+        <div id="recipeResult"></div>
 
-      <button type="button" id="btnStep1">Weiter</button>
-    </div>
+        <button type="button" id="btnBackTo2" class="btn-secondary">Zurück</button>
+      </div>
 
-    <!-- ==================== SCHRITT 2 ==================== -->
-    <div id="step2" class="step hidden">
-      <h2>Schritt 2: Cocktail auswählen</h2>
-
-      <!-- Dropdown für die API-Ergebnisse -->
-      <select id="resultsSelect">
-        <option value="">-- Bitte wählen --</option>
-      </select>
-
-      <button type="button" id="btnBackTo1">Zurück</button>
-      <button type="button" id="btnStep2">Rezept anzeigen</button>
-    </div>
-
-    <!-- ==================== SCHRITT 3 ==================== -->
-    <div id="step3" class="step hidden">
-      <h2>Schritt 3: Rezept</h2>
-      
-      <!-- Hier fügt JS das fertige Ergebnis ein -->
-      <div id="recipeResult"></div>
-
-      <button type="button" id="btnBackTo2">Zurück</button>
-    </div>
-
-  </form>
+    </form>
+  </main>
 
   <!-- Verknüpfung mit der JS-Datei (am Ende des body geladen) -->
   <script src="script.js"></script>

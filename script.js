@@ -1,12 +1,10 @@
 // =========================================================
 // 1. HTML-ELEMENTE REFERENZIEREN
 // =========================================================
-// Schritt-Container
 const step1 = document.getElementById('step1');
 const step2 = document.getElementById('step2');
 const step3 = document.getElementById('step3');
 
-// Eingabefelder & Steuerung
 const searchType = document.getElementById('searchType');
 const groupName = document.getElementById('groupName');
 const groupIngredient = document.getElementById('groupIngredient');
@@ -16,7 +14,6 @@ const feedbackText = document.getElementById('feedbackText');
 const resultsSelect = document.getElementById('resultsSelect');
 const recipeResult = document.getElementById('recipeResult');
 
-// Buttons
 const btnStep1 = document.getElementById('btnStep1');
 const btnStep2 = document.getElementById('btnStep2');
 const btnBackTo1 = document.getElementById('btnBackTo1');
@@ -24,147 +21,182 @@ const btnBackTo2 = document.getElementById('btnBackTo2');
 
 
 // =========================================================
-// 2. DYNAMISCHES EIN-/AUSBLENDEN DER FELDER
+// 2. REGULÄRE AUSDRÜCKE (E2: Buchstaben & Zahlen erlaubt)
 // =========================================================
-// Reagiert jedes Mal, wenn der Benutzer im Dropdown etwas auswählt
-searchType.addEventListener('change', () => {
-  
-  // Wenn der Modus "Cocktailname" gewählt ist:
-  if (searchType.value === 'name') {
-    groupName.classList.remove('hidden');    // Entfernt 'hidden' -> Namensfeld wird sichtbar
-    groupIngredient.classList.add('hidden'); // Fügt 'hidden' hinzu -> Zutatenfeld verschwindet
-  } 
-  // Wenn der Modus "Hauptzutat" gewählt ist:
-  else {
-    groupIngredient.classList.remove('hidden'); // Entfernt 'hidden' -> Zutatenfeld wird sichtbar
-    groupName.classList.add('hidden');          // Fügt 'hidden' hinzu -> Namensfeld verschwindet
-  }
+const regexInput = /^[a-zA-Z0-9äöüÄÖÜßàáâèéê\s-]{2,30}$/;
 
-  // Setzt Texte und rote/grüne Rahmen beim Umschalten zurück
-  resetValidation(); 
+
+// =========================================================
+// 3. DYNAMISCHES EIN-/AUSBLENDEN DER FELDER
+// =========================================================
+searchType.addEventListener('change', () => {
+  if (searchType.value === 'name') {
+    groupName.classList.remove('hidden');
+    groupIngredient.classList.add('hidden');
+  } else {
+    groupIngredient.classList.remove('hidden');
+    groupName.classList.add('hidden');
+  }
+  resetValidation();
 });
 
 
 // =========================================================
-// 3. VISUELLES FEEDBACK & VALIDIERUNG
+// 4. VISUELLES FEEDBACK & VALIDIERUNG
 // =========================================================
-// Prüft bei jeder Tastatureingabe im Namensfeld
 inputName.addEventListener('input', () => {
   validate(inputName);
 });
 
-// Prüft bei jeder Tastatureingabe im Zutatenfeld
 inputIngredient.addEventListener('input', () => {
   validate(inputIngredient);
 });
 
-// Funktion zur Auswertung der Eingabe (mindestens 2 Zeichen)
 function validate(inputField) {
   const text = inputField.value.trim();
 
+  // 1. Feld ist leer
   if (text.length === 0) {
-    // Feld ist leer -> Standardsituation
     inputField.className = '';
+    inputField.setAttribute('aria-invalid', 'false');
     feedbackText.textContent = '';
-  } else if (text.length < 2) {
-    // Zu kurz -> Rot (Ungültig)
-    inputField.className = 'invalid';
-    feedbackText.textContent = '❌ Bitte mindestens 2 Zeichen eingeben.';
-    feedbackText.style.color = 'red';
-  } else {
-    // Lang genug -> Grün (Gültig)
-    inputField.className = 'valid';
-    feedbackText.textContent = '✓ Eingabe gültig';
-    feedbackText.style.color = 'green';
+    feedbackText.className = '';
+    return false;
   }
+
+  // 2. Zu kurz oder zu lang
+  if (text.length < 2 || text.length > 30) {
+    inputField.className = 'invalid';
+    inputField.setAttribute('aria-invalid', 'true');
+    feedbackText.textContent = '❌ Eingabe muss zwischen 2 und 30 Zeichen lang sein.';
+    feedbackText.className = 'text-error';
+    return false;
+  }
+
+  // 3. Regex-Prüfung (Nur Buchstaben und Zahlen erlaubt)
+  if (!regexInput.test(text)) {
+    inputField.className = 'invalid';
+    inputField.setAttribute('aria-invalid', 'true');
+    feedbackText.textContent = '❌ Nur Buchstaben und Zahlen sind gültig.';
+    feedbackText.className = 'text-error';
+    return false;
+  }
+
+  // 4. Gültig
+  inputField.className = 'valid';
+  inputField.setAttribute('aria-invalid', 'false');
+  feedbackText.textContent = '✓ Eingabe gültig';
+  feedbackText.className = 'text-success';
+  return true;
 }
 
-// Setzt die CSS-Klassen und Nachrichten zurück
 function resetValidation() {
   inputName.value = '';
   inputIngredient.value = '';
   inputName.className = '';
   inputIngredient.className = '';
+  inputName.setAttribute('aria-invalid', 'false');
+  inputIngredient.setAttribute('aria-invalid', 'false');
   feedbackText.textContent = '';
+  feedbackText.className = '';
 }
 
 
 // =========================================================
-// 4. MULTI-STEP NAVIGATION & API-ABFRAGEN
+// 5. MULTI-STEP NAVIGATION & API-ABFRAGEN
 // =========================================================
 
-// --- SCHRITT 1 -> SCHRITT 2 (Suchanfrage an API) ---
 btnStep1.addEventListener('click', async () => {
-  // Entscheiden, welches Feld gelesen werden soll
   const isNameMode = searchType.value === 'name';
-  const query = isNameMode ? inputName.value.trim() : inputIngredient.value.trim();
+  const currentInput = isNameMode ? inputName : inputIngredient;
+  const searchCategory = isNameMode ? 'Cocktail' : 'Zutat';
 
-  // Abbrechen, wenn das Feld weniger als 2 Zeichen hat
-  if (query.length < 2) {
-    alert('Bitte gib zuerst einen gültigen Suchbegriff ein.');
+  // Eingabe überprüfen
+  const isValid = validate(currentInput);
+  if (!isValid) {
     return;
   }
 
-  // API-URL festlegen (Suche nach Name ODER nach Zutat)
+  const query = currentInput.value.trim();
   const url = isNameMode
-    ? `https://www.thecocktaildb.com/api/json/v1/1/search.php?s=${query}`
-    : `https://www.thecocktaildb.com/api/json/v1/1/filter.php?i=${query}`;
+    ? `https://www.thecocktaildb.com/api/json/v1/1/search.php?s=${encodeURIComponent(query)}`
+    : `https://www.thecocktaildb.com/api/json/v1/1/filter.php?i=${encodeURIComponent(query)}`;
 
-  // API-Abfrage durchführen
-  const response = await fetch(url);
-  const data = await response.json();
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
 
-  // Dropdown zurücksetzen
-  resultsSelect.innerHTML = '<option value="">-- Bitte wählen --</option>';
+    resultsSelect.innerHTML = '<option value="">-- Bitte wählen --</option>';
 
-  // Prüfen, ob Ergebnisse gefunden wurden
-  if (data.drinks) {
-    // Gefundene Cocktails in das Schritt-2-Dropdown füllen
-    data.drinks.forEach(drink => {
-      const option = document.createElement('option');
-      option.value = drink.idDrink; // Speichert die Cocktail-ID
-      option.textContent = drink.strDrink; // Zeigt den Namen an
-      resultsSelect.appendChild(option);
-    });
+    if (data.drinks) {
+      data.drinks.forEach(drink => {
+        const option = document.createElement('option');
+        option.value = drink.idDrink;
+        option.textContent = drink.strDrink;
+        resultsSelect.appendChild(option);
+      });
 
-    // Navigation zu Schritt 2
-    step1.classList.add('hidden');
-    step2.classList.remove('hidden');
-  } else {
-    alert('Keine Cocktails gefunden!');
+      // Navigation zu Schritt 2
+      step1.classList.add('hidden');
+      step2.classList.remove('hidden');
+    } else {
+      // Spezifische Fehlermeldung bei Nicht-Existenz
+      feedbackText.textContent = `❌ ${searchCategory} existiert nicht.`;
+      feedbackText.className = 'text-error';
+      currentInput.className = 'invalid';
+      currentInput.setAttribute('aria-invalid', 'true');
+    }
+  } catch (error) {
+    feedbackText.textContent = '❌ Fehler beim Abfragen der Daten.';
+    feedbackText.className = 'text-error';
   }
 });
 
 
-// --- SCHRITT 2 -> SCHRITT 3 (Cocktail-Details laden) ---
 btnStep2.addEventListener('click', async () => {
   const drinkId = resultsSelect.value;
 
-  // Abbrechen, wenn nichts ausgewählt ist
   if (!drinkId) {
     alert('Bitte wähle einen Cocktail aus.');
     return;
   }
 
-  // API-Abfrage über die ID
-  const response = await fetch(`https://www.thecocktaildb.com/api/json/v1/1/lookup.php?i=${drinkId}`);
-  const data = await response.json();
-  const drink = data.drinks[0];
+  try {
+    const response = await fetch(`https://www.thecocktaildb.com/api/json/v1/1/lookup.php?i=${drinkId}`);
+    const data = await response.json();
+    const drink = data.drinks[0];
 
-  // Ergebnis in Schritt 3 als HTML rendern
-  recipeResult.innerHTML = `
-    <h3>${drink.strDrink}</h3>
-    <img src="${drink.strDrinkThumb}" width="120" alt="${drink.strDrink}">
-    <p><strong>Anleitung:</strong> ${drink.strInstructions}</p>
-  `;
+    // Anleitung in Schritte aufteilen (Sätze an Punkten trennen)
+    const rawInstructions = drink.strInstructions || '';
+    const stepsArray = rawInstructions
+      .split('.')
+      .map(sentence => sentence.trim())
+      .filter(sentence => sentence.length > 0);
 
-  // Navigation zu Schritt 3
-  step2.classList.add('hidden');
-  step3.classList.remove('hidden');
+    const stepsListHTML = stepsArray
+      .map(step => `<li>${step}.</li>`)
+      .join('');
+
+    // HTML für Schritt 3 aufbauen
+    recipeResult.innerHTML = `
+      <div class="recipe-card">
+        <h3>${drink.strDrink}</h3>
+        <img src="${drink.strDrinkThumb}" alt="${drink.strDrink}">
+        <h4>Schritt-für-Schritt Anleitung:</h4>
+        <ol class="instruction-list">
+          ${stepsListHTML}
+        </ol>
+      </div>
+    `;
+
+    step2.classList.add('hidden');
+    step3.classList.remove('hidden');
+  } catch (error) {
+    alert('Fehler beim Laden des Rezepts.');
+  }
 });
 
 
-// --- ZURÜCK-BUTTONS ---
 btnBackTo1.addEventListener('click', () => {
   step2.classList.add('hidden');
   step1.classList.remove('hidden');
