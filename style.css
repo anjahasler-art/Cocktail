@@ -1,0 +1,44 @@
+/* Hilfsklasse zum Verstecken von Elementen */
+.hidden {
+  display: none;
+}
+
+/* Basis-Styling für das Formular */
+body {
+  font-family: sans-serif;
+  padding: 20px;
+}
+
+.step {
+  border: 1px solid #ccc;
+  padding: 15px;
+  max-width: 350px;
+}
+
+div {
+  margin-bottom: 10px;
+}
+
+input, select, button {
+  width: 100%;
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+/* === VISUELLES FEEDBACK (Validierung) === */
+/* Wenn die Eingabe ungültig ist (rot) */
+input.invalid {
+  border: 2px solid red;
+  background-color: #ffe6e6;
+}
+
+/* Wenn die Eingabe gültig ist (grün) */
+input.valid {
+  border: 2px solid green;
+  background-color: #e6ffe6;
+}
+
+#feedbackText {
+  font-size: 0.85rem;
+  margin: 5px 0;
+}
