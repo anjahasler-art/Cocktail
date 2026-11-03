@@ -26,16 +26,22 @@ const btnBackTo2 = document.getElementById('btnBackTo2');
 // =========================================================
 // 2. DYNAMISCHES EIN-/AUSBLENDEN DER FELDER
 // =========================================================
-// Reagiert, wenn der Benutzer im ersten Dropdown die Suchart ändert
+// Reagiert jedes Mal, wenn der Benutzer im Dropdown etwas auswählt
 searchType.addEventListener('change', () => {
+  
+  // Wenn der Modus "Cocktailname" gewählt ist:
   if (searchType.value === 'name') {
-    groupName.classList.remove('hidden');       // Name anzeigen
-    groupIngredient.classList.add('hidden');    // Zutat verstecken
-  } else {
-    groupIngredient.classList.remove('hidden'); // Zutat anzeigen
-    groupName.classList.add('hidden');          // Name verstecken
+    groupName.classList.remove('hidden');    // Entfernt 'hidden' -> Namensfeld wird sichtbar
+    groupIngredient.classList.add('hidden'); // Fügt 'hidden' hinzu -> Zutatenfeld verschwindet
+  } 
+  // Wenn der Modus "Hauptzutat" gewählt ist:
+  else {
+    groupIngredient.classList.remove('hidden'); // Entfernt 'hidden' -> Zutatenfeld wird sichtbar
+    groupName.classList.add('hidden');          // Fügt 'hidden' hinzu -> Namensfeld verschwindet
   }
-  resetValidation(); // Validierung beim Umschalten zurücksetzen
+
+  // Setzt Texte und rote/grüne Rahmen beim Umschalten zurück
+  resetValidation(); 
 });
 
 
