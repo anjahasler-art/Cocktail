@@ -108,6 +108,7 @@ function resetValidation() {
 // 5. MULTI-STEP NAVIGATION & API-ABFRAGEN
 // =========================================================
 
+// Parameter 1: Welcher Suchmodus wurde im Dropdown ausgewählt?
 btnStep1.addEventListener('click', async () => {
   const isNameMode = searchType.value === 'name';
   const currentInput = isNameMode ? inputName : inputIngredient;
@@ -119,11 +120,16 @@ btnStep1.addEventListener('click', async () => {
     return;
   }
 
+  // Parameter 2: Textausgabe aus dem Input-Feld abgreifen
+
   const query = currentInput.value.trim();
+
+  // Parameter 3: URL parametrisieren (encodeURIComponent schützt vor Sonderzeichen)
   const url = isNameMode
     ? `https://www.thecocktaildb.com/api/json/v1/1/search.php?s=${encodeURIComponent(query)}`
     : `https://www.thecocktaildb.com/api/json/v1/1/filter.php?i=${encodeURIComponent(query)}`;
 
+  // Asynchroner Aufruf (fetch)
   try {
     const response = await fetch(url);
     const data = await response.json();
