@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cocktail-Finder – Startseite</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #ff416c 0%, #ff7b39 100%);
+      background-attachment: fixed;
+      color: #f4f4f5;
+      margin: 0;
+      padding: 16px;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Gesamt-Wrapper für das Martiniglas */
+    .martini-wrapper {
+      width: 100%;
+      max-width: 840px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* 1. KELCH (Klassisches Dreieck) */
+    .martini-bowl {
+      width: 100%;
+      background-color: #09090b;
+      clip-path: polygon(0% 0%, 100% 0%, 51.5% 100%, 48.5% 100%);
+      padding: 20px 65px 160px 65px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    /* 2. LANGER, SCHLANKER STIEL */
+    .martini-stem {
+      width: 14px;
+      height: 135px;
+      background-color: #09090b;
+      margin-top: -1px;
+    }
+
+    /* 3. FLACHER, BREITER STANDFUSS */
+    .martini-base {
+      width: 260px;
+      height: 14px;
+      background-color: #09090b;
+      border-radius: 50% / 100% 100% 25% 25%;
+      margin-top: -1px;
+    }
+
+    /* Sprach-Switch oben rechts */
+    .top-bar {
+      width: 100%;
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 6px;
+    }
+
+    .lang-switch {
+      display: inline-flex;
+      background-color: #18181d;
+      border: 1px solid #2e2e36;
+      border-radius: 20px;
+      padding: 3px;
+    }
+
+    .lang-btn {
+      padding: 4px 14px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 17px;
+      background-color: transparent;
+      color: #d4d4d8;
+      cursor: pointer;
+    }
+
+    .lang-btn.active {
+      background: linear-gradient(135deg, #ff416c, #ff7b39);
+      color: #ffffff;
+    }
+
+    /* Kopfbereich */
+    .hero {
+      width: 100%;
+      max-width: 540px;
+      margin-bottom: 14px;
+    }
+
+    .badge {
+      display: inline-block;
+      background-color: #18181d;
+      border: 1px solid #ff5566;
+      color: #ff8577;
+      font-weight: 700;
+      font-size: 0.78rem;
+      padding: 3px 12px;
+      border-radius: 20px;
+      margin-bottom: 6px;
+    }
+
+    h1 {
+      margin: 2px 0 8px 0;
+      font-size: 1.9rem;
+      background: linear-gradient(135deg, #ff4b72, #ff8547);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      font-size: 0.9rem;
+      color: #d4d4d8;
+      line-height: 1.45;
+      margin: 0;
+    }
+
+    /* Interaktiver Bereich (schmaler dimensioniert, damit keine Ecke abgeschnitten wird) */
+    .section-box {
+      width: 100%;
+      max-width: 340px;
+      background-color: #141418;
+      border: 1px solid #2a2a33;
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin-bottom: 14px;
+      text-align: left;
+    }
+
+    .section-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin: 0 0 8px 0;
+      color: #ffffff;
+      text-align: center;
+    }
+
+    .step-tabs {
+      display: flex;
+      gap: 5px;
+      margin-bottom: 8px;
+    }
+
+    .step-tab {
+      flex: 1;
+      padding: 6px 4px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border: 1px solid #2e2e38;
+      border-radius: 7px;
+      background-color: #1c1c22;
+      color: #d4d4d8;
+      cursor: pointer;
+    }
+
+    .step-tab:hover {
+      border-color: #ff5566;
+      color: #ffffff;
+    }
+
+    .step-tab.active {
+      background: linear-gradient(135deg, #ff416c, #ff7b39);
+      border-color: transparent;
+      color: #ffffff;
+    }
+
+    .step-content {
+      background-color: #09090b;
+      border-radius: 7px;
+      padding: 9px 10px;
+      font-size: 0.8rem;
+      line-height: 1.4;
+      color: #e4e4e7;
+      min-height: 68px;
+      border-left: 3px solid #ff5566;
+    }
+
+    /* Start-Button */
+    .cta-link {
+      display: inline-block;
+      width: 100%;
+      max-width: 210px;
+      text-align: center;
+      text-decoration: none;
+      padding: 10px 14px;
+      font-size: 0.88rem;
+      font-weight: bold;
+      background: linear-gradient(135deg, #ff416c, #ff7b39);
+      color: #ffffff;
+      border-radius: 8px;
+    }
+
+    .cta-link:hover {
+      filter: brightness(1.08);
+    }
+
+    /* Mobile Anpassung */
+    @media (max-width: 680px) {
+      .martini-bowl {
+        clip-path: polygon(0% 0%, 100% 0%, 53% 100%, 47% 100%);
+        padding: 18px 28px 130px 28px;
+      }
+
+      .section-box {
+        max-width: 270px;
+      }
+
+      .step-tabs {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <main class="martini-wrapper">
+    <!-- 1. Kelch -->
+    <div class="martini-bowl">
+      <!-- Sprach-Switch oben rechts -->
+      <div class="top-bar">
+        <div class="lang-switch" role="group" aria-label="Sprache wählen">
+          <button type="button" id="btnLangDE" class="lang-btn active">DE</button>
+          <button type="button" id="btnLangEN" class="lang-btn">EN</button>
+        </div>
+      </div>
+
+      <!-- Erklärung -->
+      <section class="hero">
+        <span class="badge" data-i18n="badge">🍹 Über diese Web-App</span>
+        <h1 data-i18n="title">Cocktail-Finder</h1>
+        <p class="subtitle" data-i18n="subtitle">
+          Dein interaktiver Rezept-Assistent für Mixgetränke aller Art – klassisch oder alkoholfrei, inklusive Zutaten, Glasempfehlung und Schritt-für-Schritt-Anleitung.
+        </p>
+      </section>
+
+      <!-- Interaktive Schritte -->
+      <section class="section-box">
+        <h2 class="section-title" data-i18n="howTitle">✨ So funktioniert die App:</h2>
+        <div class="step-tabs">
+          <button type="button" class="step-tab active" data-tab="1" data-i18n="tab1">1. Suchart</button>
+          <button type="button" class="step-tab" data-tab="2" data-i18n="tab2">2. Auswahl</button>
+          <button type="button" class="step-tab" data-tab="3" data-i18n="tab3">3. Rezept</button>
+        </div>
+        <div id="stepContent" class="step-content"></div>
+      </section>
+
+      <!-- Weiterleitung zu index.html -->
+      <a href="index.html" class="cta-link" data-i18n="ctaBtn">Zur Cocktail-Suche →</a>
+    </div>
+
+    <!-- 2. Stiel -->
+    <div class="martini-stem" aria-hidden="true"></div>
+
+    <!-- 3. Fuß -->
+    <div class="martini-base" aria-hidden="true"></div>
+  </main>
+
+  <script>
+    const btnLangDE = document.getElementById('btnLangDE');
+    const btnLangEN = document.getElementById('btnLangEN');
+    const stepTabs = document.querySelectorAll('.step-tab');
+    const stepContent = document.getElementById('stepContent');
+
+    let currentLang = 'de';
+    let currentTab = '1';
+
+    const content = {
+      de: {
+        badge: '🍹 Über diese Web-App',
+        title: 'Cocktail-Finder',
+        subtitle: 'Dein interaktiver Rezept-Assistent für Mixgetränke aller Art – klassisch oder alkoholfrei, inklusive Zutaten, Glasempfehlung und Schritt-für-Schritt-Anleitung. Beste Webseite für Cocktails von Laura und Anja (die Gs).',
+        howTitle: '✨ So funktioniert die App:',
+        tab1: '1. Suchart',
+        tab2: '2. Auswahl',
+        tab3: '3. Rezept',
+        tabsDesc: {
+          '1': '🔍 Suche gezielt nach einem Cocktailnamen, nach einer Zutat aus deinem Vorrat oder nutze den Zufallsgenerator.',
+          '2': '📋 Alle passenden Treffer werden übersichtlich von A bis Z in einer Auswahlliste für dich sortiert.',
+          '3': '🥃 Du erhältst das komplette Rezept mit Foto, Glasempfehlung, Mengenangaben und Anleitung auf DE oder EN.'
+        },
+        ctaBtn: 'Zur Cocktail-Suche →'
+      },
+      en: {
+        badge: '🍹 About this Web App',
+        title: 'Cocktail-Finder',
+        subtitle: 'Your interactive recipe assistant for all kinds of mixed drinks – classic or non-alcoholic, including ingredients, glass recommendations, and step-by-step instructions.',
+        howTitle: '✨ How the app works:',
+        tab1: '1. Search',
+        tab2: '2. Select',
+        tab3: '3. Recipe',
+        tabsDesc: {
+          '1': '🔍 Search by cocktail name, by an ingredient you already have at home, or use the random generator.',
+          '2': '📋 All matching drinks are neatly sorted alphabetically from A to Z in a dropdown list.',
+          '3': '🥃 Get the full recipe with photo, glass recommendation, measurements, and instructions in EN or DE.'
+        },
+        ctaBtn: 'Start Cocktail Search →'
+      }
+    };
+
+    function updateUI() {
+      const langData = content[currentLang];
+
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (langData[key]) {
+          el.textContent = langData[key];
+        }
+      });
+
+      stepContent.textContent = langData.tabsDesc[currentTab];
+    }
+
+    btnLangDE.addEventListener('click', () => {
+      currentLang = 'de';
+      btnLangDE.classList.add('active');
+      btnLangEN.classList.remove('active');
+      updateUI();
+    });
+
+    btnLangEN.addEventListener('click', () => {
+      currentLang = 'en';
+      btnLangEN.classList.add('active');
+      btnLangDE.classList.remove('active');
+      updateUI();
+    });
+
+    stepTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        stepTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentTab = tab.getAttribute('data-tab');
+        stepContent.textContent = content[currentLang].tabsDesc[currentTab];
+      });
+    });
+
+    updateUI();
+  </script>
+</body>
+</html>
