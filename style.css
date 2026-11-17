@@ -25,51 +25,59 @@ body {
   max-width: 520px;
 }
 
-.step {
+/* Gemeinsame Karte für alle Schritte */
+.form-card {
   background-color: #ffffff;
-  border: 1px solid #ffffff;
-  border-radius: 12px;
-  padding: 30px;
+  border-radius: 14px;
+  padding: 25px 30px 30px 30px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
 }
 
-/* Kopfzeile in Schritt 1 für Titel + Sprachbutton */
-.step-header {
+/* === DAUERHAFTER SPRACH-SWITCH OBEN RECHTS === */
+.top-bar {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid #333;
-  padding-bottom: 10px;
-  margin-bottom: 20px;
+  justify-content: flex-end;
+  margin-bottom: 10px;
 }
 
-.step-header h2 {
-  border-bottom: none;
-  padding-bottom: 0;
+.lang-switch {
+  display: inline-flex;
+  background-color: #f6bf99;
+  border-radius: 20px;
+  padding: 3px;
   margin-bottom: 0;
 }
 
+.lang-btn {
+  width: auto;
+  margin-top: 0;
+  padding: 5px 14px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 17px;
+  background-color: transparent;
+  color: #312e2c;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.lang-btn:hover {
+  background-color: rgba(235, 126, 37, 0.2);
+}
+
+.lang-btn.active {
+  background-color: #eb7e25;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Überschriften ohne störende Linien */
 .step h2 {
   margin-top: 0;
   margin-bottom: 20px;
   font-size: 1.5rem;
   color: #000000;
-  border-bottom: 1px solid #333;
-  padding-bottom: 10px;
-}
-
-/* Kleiner Sprach-Button oben rechts */
-button.btn-lang {
-  width: auto;
-  padding: 6px 12px;
-  font-size: 0.85rem;
-  margin-top: 0;
-  background-color: #312e2c;
-  color: #ffffff;
-}
-
-button.btn-lang:hover {
-  background-color: #eb7e25;
 }
 
 div {
@@ -100,19 +108,8 @@ input[type="text"]:focus, select:focus {
   border-color: #ff6600;
 }
 
-/* Mehrfach-Ansicht für die grosse Liste in Schritt 2 */
-select[size] {
-  height: auto;
-  padding: 6px;
-}
-
-select[size] option {
-  padding: 8px;
-  border-radius: 4px;
-}
-
-/* Buttons */
-button {
+/* Haupt-Buttons */
+button:not(.lang-btn) {
   width: 100%;
   padding: 12px;
   font-size: 1rem;
@@ -126,7 +123,7 @@ button {
   margin-top: 10px;
 }
 
-button:hover {
+button:not(.lang-btn):hover {
   background-color: #d66d18;
 }
 
@@ -218,12 +215,11 @@ input.valid {
   margin-bottom: 5px;
 }
 
-/* Schritt-für-Schritt Anleitung */
-.instruction-list {
-  padding-left: 20px;
+/* Fließtext-Anleitung (wie im Englischen, ohne Punkt-Zerstückelung) */
+.instruction-text {
   line-height: 1.6;
-}
-
-.instruction-list li {
-  margin-bottom: 8px;
+  background-color: #f9f9f9;
+  padding: 14px;
+  border-radius: 6px;
+  margin: 0;
 }

@@ -8,18 +8,21 @@
 <body>
 
   <main class="main-container">
-    <form id="cocktailForm" onsubmit="return false;">
+    <form id="cocktailForm" onsubmit="return false;" class="form-card">
+
+      <!-- DAUERHAFT SICHTBARER SPRACH-SWITCH OBEN RECHTS -->
+      <div class="top-bar">
+        <div class="lang-switch" role="group" aria-label="Sprache wählen">
+          <button type="button" id="btnLangDE" class="lang-btn active">DE</button>
+          <button type="button" id="btnLangEN" class="lang-btn">EN</button>
+        </div>
+      </div>
 
       <!-- ==================== SCHRITT 1 ==================== -->
       <div id="step1" class="step">
-        
-        <!-- Kopfzeile mit Titel und kleinem Sprach-Button -->
-        <div class="step-header">
-          <h2 data-i18n="step1Title">Schritt 1: Suche</h2>
-          <button type="button" id="btnLang" class="btn-lang">🌐 DE</button>
-        </div>
+        <h2 data-i18n="step1Title">Schritt 1: Suche</h2>
 
-        <!-- Dropdown für die Suchart (inkl. Random) -->
+        <!-- Dropdown für die Suchart -->
         <label for="searchType" data-i18n="labelSearchType">Suchen nach:</label>
         <select id="searchType">
           <option value="name" data-i18n="optName">Cocktailname</option>
@@ -46,14 +49,14 @@
           <input 
             type="text" 
             id="inputIngredient" 
-            placeholder="z. B. Gin"
+            placeholder="z. B. Rum"
             aria-describedby="feedbackText ingredientHint"
             aria-invalid="false"
           >
           <small id="ingredientHint" class="hint-text" data-i18n="hintText">Buchstaben und Zahlen sind gültig (2–30 Zeichen).</small>
         </div>
 
-        <!-- Filter für Alkohol / Alkoholfrei (wird bei Random ausgeblendet) -->
+        <!-- Filter für Alkohol / Alkoholfrei -->
         <div id="groupAlcohol">
           <label for="alcoholFilter" data-i18n="labelAlcohol">Alkoholgehalt:</label>
           <select id="alcoholFilter">
@@ -73,13 +76,13 @@
       <div id="step2" class="step hidden">
         <h2 data-i18n="step2Title">Schritt 2: Cocktail auswählen</h2>
 
-        <!-- Live-Suchfeld für schnelle Filterung in der grossen Liste -->
+        <!-- Live-Suchfeld für schnelle Filterung -->
         <label for="filterResultsInput" data-i18n="labelFilterResults">Liste durchsuchen:</label>
         <input type="text" id="filterResultsInput" placeholder="Name tippen zum Filtern...">
 
-        <!-- Dropdown für alle API-Ergebnisse -->
+        <!-- Klassisches Dropdown für alle gefundenen API-Ergebnisse -->
         <label for="resultsSelect" id="resultsCountLabel">Ergebnisliste:</label>
-        <select id="resultsSelect" size="6">
+        <select id="resultsSelect">
           <option value="">-- Bitte wählen --</option>
         </select>
 
