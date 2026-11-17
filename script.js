@@ -121,7 +121,6 @@ btnStep1.addEventListener('click', async () => {
   }
 
   // Parameter 2: Textausgabe aus dem Input-Feld abgreifen
-
   const query = currentInput.value.trim();
 
   // Parameter 3: URL parametrisieren (encodeURIComponent schützt vor Sonderzeichen)
@@ -133,6 +132,9 @@ btnStep1.addEventListener('click', async () => {
   try {
     const response = await fetch(url);
     const data = await response.json();
+
+    console.log(data);
+    
 
     resultsSelect.innerHTML = '<option value="">-- Bitte wählen --</option>';
 
