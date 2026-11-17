@@ -76,11 +76,7 @@
       <div id="step2" class="step hidden">
         <h2 data-i18n="step2Title">Schritt 2: Cocktail auswählen</h2>
 
-        <!-- Live-Suchfeld für schnelle Filterung -->
-        <label for="filterResultsInput" data-i18n="labelFilterResults">Liste durchsuchen:</label>
-        <input type="text" id="filterResultsInput" placeholder="Name tippen zum Filtern...">
-
-        <!-- Klassisches Dropdown für alle gefundenen API-Ergebnisse -->
+        <!-- Klassisches Dropdown für alle gefundenen API-Ergebnisse (ohne extra Suchfeld) -->
         <label for="resultsSelect" id="resultsCountLabel">Ergebnisliste:</label>
         <select id="resultsSelect">
           <option value="">-- Bitte wählen --</option>
@@ -96,10 +92,19 @@
       <div id="step3" class="step hidden">
         <h2 data-i18n="step3Title">Schritt 3: Rezept</h2>
         
-        <!-- Hier fügt JS Glas, Zutaten und Anleitung ein -->
+        <!-- Hier fügt JS Glas, Zutaten (inkl. übersetzter Mengen) und nummerierte Anleitung ein -->
         <div id="recipeResult"></div>
 
-        <button type="button" id="btnBackTo2" class="btn-secondary" data-i18n="btnBack">Zurück</button>
+        <!-- Standard-Zurück-Button (bei normaler Suche) -->
+        <div id="normalStep3Buttons">
+          <button type="button" id="btnBackTo2" class="btn-secondary" data-i18n="btnBack">Zurück</button>
+        </div>
+
+        <!-- Spezial-Buttons nur bei Random Cocktail -->
+        <div id="randomStep3Buttons" class="button-group hidden">
+          <button type="button" id="btnBackToStartFromRandom" class="btn-secondary" data-i18n="btnNewSearch">Neue Suche</button>
+          <button type="button" id="btnAnotherRandom" data-i18n="btnAnotherRandom">🎲 Anderer Cocktail</button>
+        </div>
       </div>
 
     </form>

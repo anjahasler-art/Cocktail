@@ -18,7 +18,6 @@ const inputName = document.getElementById('inputName');
 const inputIngredient = document.getElementById('inputIngredient');
 const feedbackText = document.getElementById('feedbackText');
 
-const filterResultsInput = document.getElementById('filterResultsInput');
 const resultsSelect = document.getElementById('resultsSelect');
 const resultsCountLabel = document.getElementById('resultsCountLabel');
 const recipeResult = document.getElementById('recipeResult');
@@ -28,11 +27,16 @@ const btnStep2 = document.getElementById('btnStep2');
 const btnBackTo1 = document.getElementById('btnBackTo1');
 const btnBackTo2 = document.getElementById('btnBackTo2');
 
+// Buttons für Random-Modus in Schritt 3
+const normalStep3Buttons = document.getElementById('normalStep3Buttons');
+const randomStep3Buttons = document.getElementById('randomStep3Buttons');
+const btnAnotherRandom = document.getElementById('btnAnotherRandom');
+const btnBackToStartFromRandom = document.getElementById('btnBackToStartFromRandom');
+
 // Globale Variablen
 let currentLang = 'de';
 let allFetchedDrinks = [];
 let currentDisplayedDrink = null;
-let cameFromRandom = false;
 
 
 // =========================================================
@@ -54,15 +58,15 @@ const translations = {
     optNonAlcoholic: 'Alkoholfrei',
     btnNext: 'Weiter',
     step2Title: 'Schritt 2: Cocktail auswählen',
-    labelFilterResults: 'Liste durchsuchen:',
-    filterPlaceholder: 'Name tippen zum Filtern...',
     selectDefault: '-- Bitte Cocktail wählen --',
     btnBack: 'Zurück',
     btnShowRecipe: 'Rezept anzeigen',
     step3Title: 'Schritt 3: Rezept',
     glassTitle: '🥃 Benötigtes Glas:',
     ingredientsTitle: '🍋 Zutaten:',
-    instructionsTitle: '📋 Zubereitung:'
+    instructionsTitle: '📋 Schritt-für-Schritt Anleitung:',
+    btnAnotherRandom: '🎲 Anderer Cocktail',
+    btnNewSearch: 'Neue Suche'
   },
   en: {
     step1Title: 'Step 1: Search',
@@ -79,26 +83,24 @@ const translations = {
     optNonAlcoholic: 'Non-Alcoholic',
     btnNext: 'Next',
     step2Title: 'Step 2: Choose Cocktail',
-    labelFilterResults: 'Filter list:',
-    filterPlaceholder: 'Type name to filter...',
     selectDefault: '-- Please select a cocktail --',
     btnBack: 'Back',
     btnShowRecipe: 'Show Recipe',
     step3Title: 'Step 3: Recipe',
     glassTitle: '🥃 Required Glass:',
     ingredientsTitle: '🍋 Ingredients:',
-    instructionsTitle: '📋 Instructions:'
+    instructionsTitle: '📋 Step-by-Step Instructions:',
+    btnAnotherRandom: '🎲 Another Cocktail',
+    btnNewSearch: 'New Search'
   }
 };
 
 function setLanguage(lang) {
   currentLang = lang;
 
-  // Aktiven Button markieren
   btnLangDE.classList.toggle('active', lang === 'de');
   btnLangEN.classList.toggle('active', lang === 'en');
 
-  // Alle Texte auf der Seite übersetzen
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
     if (translations[lang][key]) {
@@ -106,12 +108,11 @@ function setLanguage(lang) {
     }
   });
 
-  filterResultsInput.placeholder = translations[lang].filterPlaceholder;
   if (allFetchedDrinks.length > 0) {
     updateResultsDropdown(allFetchedDrinks);
   }
 
-  // Rezept in Schritt 3 sofort in neuer Sprache anzeigen, falls wir uns dort befinden
+  // Wenn wir in Schritt 3 sind, Rezept sofort neu übersetzen & rendern
   if (!step3.classList.contains('hidden') && currentDisplayedDrink) {
     renderRecipe(currentDisplayedDrink);
   }
@@ -120,7 +121,7 @@ function setLanguage(lang) {
 btnLangDE.addEventListener('click', () => setLanguage('de'));
 btnLangEN.addEventListener('click', () => setLanguage('en'));
 
-// Übersetzt englische Texte (Glas, Zutaten, Anleitung) live ins Deutsche
+// Übersetzt englische Texte ins Deutsche (inkl. Mengenangaben wie "oz", "dash", "tsp", "cup")
 async function translateToGerman(text) {
   if (!text || text.trim() === '') return '';
   try {
@@ -211,31 +212,48 @@ function resetValidation() {
 
 
 // =========================================================
-// 4. SCHRITT 1 -> SCHRITT 2 (INKL. INTELLIGENTER ZUTATENSUCHE)
+// 4. HILFSFUNKTION FÜR RANDOM COCKTAIL
+// =========================================================
+async function loadRandomCocktail() {
+  try {
+    const response = await fetch('https://www.thecocktaildb.com/api/json/v1/1/random.php');
+    const data = await response.json();
+    const randomDrink = data.drinks[0];
+
+    // Buttons für Random-Modus einblenden, normalen Zurück-Button ausblenden
+    normalStep3Buttons.classList.add('hidden');
+    randomStep3Buttons.classList.remove('hidden');
+
+    step1.classList.add('hidden');
+    step3.classList.remove('hidden');
+    await renderRecipe(randomDrink);
+  } catch (error) {
+    feedbackText.textContent = '❌ Fehler beim Laden des Zufalls-Cocktails.';
+    feedbackText.className = 'text-error';
+  }
+}
+
+// Klick auf "Anderer Cocktail" in Schritt 3 lädt direkt den nächsten Zufalls-Cocktail
+btnAnotherRandom.addEventListener('click', loadRandomCocktail);
+
+
+// =========================================================
+// 5. SCHRITT 1 -> SCHRITT 2 (INKL. VOLLSTÄNDIGER ZUTATENSUCHE)
 // =========================================================
 btnStep1.addEventListener('click', async () => {
   const mode = searchType.value;
 
   // --- FALL A: RANDOM COCKTAIL ---
   if (mode === 'random') {
-    try {
-      const response = await fetch('https://www.thecocktaildb.com/api/json/v1/1/random.php');
-      const data = await response.json();
-      const randomDrink = data.drinks[0];
-
-      cameFromRandom = true;
-      step1.classList.add('hidden');
-      step3.classList.remove('hidden');
-      await renderRecipe(randomDrink);
-    } catch (error) {
-      feedbackText.textContent = '❌ Fehler beim Laden des Zufalls-Cocktails.';
-      feedbackText.className = 'text-error';
-    }
+    await loadRandomCocktail();
     return;
   }
 
   // --- FALL B: SUCHE NACH NAME ODER HAUPTZUTAT ---
-  cameFromRandom = false;
+  // Normale Buttons für Schritt 3 aktivieren
+  normalStep3Buttons.classList.remove('hidden');
+  randomStep3Buttons.classList.add('hidden');
+
   const isNameMode = mode === 'name';
   const currentInput = isNameMode ? inputName : inputIngredient;
   const searchCategory = isNameMode ? 'Cocktail' : 'Zutat';
@@ -256,21 +274,33 @@ btnStep1.addEventListener('click', async () => {
         drinks = data.drinks;
       }
     } else {
-      // 2) SUCHE NACH HAUPTZUTAT (Behebt das "Rum"-Problem!)
-      // Wir holen zuerst die Liste aller Zutaten der API (list.php?i=list)
+      // 2) SUCHE NACH HAUPTZUTAT (Vollständige Suche über alle Sorten!)
+      // Wir holen die Zutatenliste der API PLUS typische Zusätze (Light/Dark/White/Spiced)
       const listRes = await fetch('https://www.thecocktaildb.com/api/json/v1/1/list.php?i=list');
       const listData = await listRes.json();
 
-      // Alle passenden Sorten finden (z.B. bei "Rum" -> "Light rum", "Dark rum", "White rum", "Rum" etc.)
-      const matchingIngredients = listData.drinks
+      const matchingFromList = listData.drinks
         .map(item => item.strIngredient1)
-        .filter(ing => ing.toLowerCase().includes(query.toLowerCase()));
+        .filter(ing => ing && ing.toLowerCase().includes(query.toLowerCase()));
 
-      // Falls keine passende Zutat gefunden wurde, trotzdem direkten Suchbegriff probieren
-      const ingredientsToFetch = matchingIngredients.length > 0 ? matchingIngredients : [query];
+      // Zusätzliche gängige Präfixe kombinieren (da list.php?i=list nicht alle Unterarten enthält!)
+      const extraVariants = [
+        query,
+        `Light ${query}`,
+        `Dark ${query}`,
+        `White ${query}`,
+        `Spiced ${query}`,
+        `Gold ${query}`,
+        `Aged ${query}`,
+        `Sweet ${query}`,
+        `Dry ${query}`
+      ];
 
-      // Alle passenden Zutaten-Sorten parallel bei der API abfragen
-      const requests = ingredientsToFetch.map(ing =>
+      // Alle Suchbegriffe ohne Duplikate zusammenfassen
+      const allIngredientQueries = Array.from(new Set([...matchingFromList, ...extraVariants]));
+
+      // Alle Zutaten-Varianten parallel abfragen
+      const requests = allIngredientQueries.map(ing =>
         fetch(`https://www.thecocktaildb.com/api/json/v1/1/filter.php?i=${encodeURIComponent(ing)}`)
           .then(res => res.json())
           .catch(() => ({ drinks: null }))
@@ -278,7 +308,7 @@ btnStep1.addEventListener('click', async () => {
 
       const results = await Promise.all(requests);
 
-      // Alle gefundenen Cocktails zusammenführen und Duplikate über eine Map entfernen
+      // Alle gefundenen Cocktails zusammenführen und Duplikate entfernen
       const uniqueDrinksMap = new Map();
       results.forEach(res => {
         if (res.drinks && Array.isArray(res.drinks)) {
@@ -291,7 +321,6 @@ btnStep1.addEventListener('click', async () => {
       drinks = Array.from(uniqueDrinksMap.values());
     }
 
-    // Wenn gar nichts gefunden wurde -> Fehlermeldung
     if (drinks.length === 0) {
       feedbackText.textContent = `❌ ${searchCategory} existiert nicht.`;
       feedbackText.className = 'text-error';
@@ -323,9 +352,8 @@ btnStep1.addEventListener('click', async () => {
     // Alphabetisch sortieren (A - Z) für Kompetenz E4
     drinks.sort((a, b) => a.strDrink.localeCompare(b.strDrink));
 
-    // Alle gefundenen Cocktails speichern und Dropdown befüllen
+    // Alle gefundenen Cocktails speichern und ins klassische Dropdown füllen
     allFetchedDrinks = drinks;
-    filterResultsInput.value = '';
     updateResultsDropdown(allFetchedDrinks);
 
     step1.classList.add('hidden');
@@ -339,7 +367,7 @@ btnStep1.addEventListener('click', async () => {
 
 
 // =========================================================
-// 5. SCHRITT 2: ALLE COCKTAILS IM DROPDOWN & LIVE-FILTER
+// 6. SCHRITT 2: ALLE COCKTAILS IM DROPDOWN ANZEIGEN
 // =========================================================
 function updateResultsDropdown(drinksList) {
   resultsSelect.innerHTML = `<option value="">${translations[currentLang].selectDefault}</option>`;
@@ -356,17 +384,9 @@ function updateResultsDropdown(drinksList) {
   });
 }
 
-filterResultsInput.addEventListener('input', () => {
-  const searchTerm = filterResultsInput.value.toLowerCase().trim();
-  const filtered = allFetchedDrinks.filter(drink => 
-    drink.strDrink.toLowerCase().includes(searchTerm)
-  );
-  updateResultsDropdown(filtered);
-});
-
 
 // =========================================================
-// 6. SCHRITT 2 -> SCHRITT 3 (REZEPT MIT ÜBERSETZUNG)
+// 7. SCHRITT 2 -> SCHRITT 3 (REZEPT MIT ÜBERSETZUNG & NUMMERIERUNG)
 // =========================================================
 btnStep2.addEventListener('click', async () => {
   const drinkId = resultsSelect.value;
@@ -389,7 +409,7 @@ btnStep2.addEventListener('click', async () => {
   }
 });
 
-// Baut das Rezept zusammen (Glas -> Zutaten -> Fließtext-Anleitung)
+// Baut das Rezept zusammen (Glas -> Zutaten inkl. übersetzter Mengen -> nummerierte Anleitung)
 async function renderRecipe(drink) {
   currentDisplayedDrink = drink;
 
@@ -409,26 +429,37 @@ async function renderRecipe(drink) {
     }
   }
 
-  // 2. GLAS & ANLEITUNG VORBEREITEN
+  // 2. GLAS, MENGEN, ZUTATEN & ANLEITUNG VORBEREITEN
   let glassText = drink.strGlass || 'Standard';
   let instructionText = drink.strInstructions || '';
 
-  // Wenn Deutsch aktiv ist: Glas, Anleitung und Zutaten ins Deutsche übersetzen
   if (currentLang === 'de') {
+    // Glas übersetzen
     glassText = await translateToGerman(glassText);
 
+    // Anleitung: Prüfen ob deutsche Version existiert, sonst übersetzen
     if (drink.strInstructionsDE && drink.strInstructionsDE.trim() !== '') {
       instructionText = drink.strInstructionsDE;
     } else {
       instructionText = await translateToGerman(instructionText);
     }
 
+    // Zutatennamen UND Mengenangaben zusammen übersetzen
     if (rawIngredients.length > 0) {
-      const namesJoined = rawIngredients.map(item => item.name).join(' | ');
-      const translatedJoined = await translateToGerman(namesJoined);
-      const translatedNames = translatedJoined.split('|').map(s => s.trim());
+      // Mengenangaben übersetzen (z.B. "1 oz" -> "1 Unze", "1 dash" -> "1 Spritzer")
+      const amountsToTranslate = rawIngredients.map(item => item.amount || '-').join(' | ');
+      const translatedAmountsRaw = await translateToGerman(amountsToTranslate);
+      const translatedAmounts = translatedAmountsRaw.split('|').map(s => s.trim());
+
+      // Zutatennamen übersetzen
+      const namesToTranslate = rawIngredients.map(item => item.name).join(' | ');
+      const translatedNamesRaw = await translateToGerman(namesToTranslate);
+      const translatedNames = translatedNamesRaw.split('|').map(s => s.trim());
 
       rawIngredients.forEach((item, index) => {
+        if (translatedAmounts[index] && translatedAmounts[index] !== '-') {
+          item.amount = translatedAmounts[index];
+        }
         if (translatedNames[index]) {
           item.name = translatedNames[index];
         }
@@ -436,11 +467,22 @@ async function renderRecipe(drink) {
     }
   }
 
+  // Zutatenliste als HTML aufbauen
   const ingredientsHTML = rawIngredients
     .map(item => `<li><strong>${item.amount}</strong> ${item.name}</li>`)
     .join('');
 
-  // 3. ALLES IN SCHRITT 3 ANZEIGEN (Zuerst Glas, dann Zutaten, dann Fließtext-Anleitung)
+  // 3. ANLEITUNG IN NUMMERIERTE SCHRITTE AUFSPLITTEN
+  const stepsArray = instructionText
+    .split('.')
+    .map(sentence => sentence.trim())
+    .filter(sentence => sentence.length > 0);
+
+  const stepsListHTML = stepsArray
+    .map(step => `<li>${step}.</li>`)
+    .join('');
+
+  // 4. ALLES IN SCHRITT 3 ANZEIGEN
   recipeResult.innerHTML = `
     <div class="recipe-card">
       <h3>${drink.strDrink}</h3>
@@ -456,14 +498,16 @@ async function renderRecipe(drink) {
       </ul>
 
       <h4>${translations[currentLang].instructionsTitle}</h4>
-      <p class="instruction-text">${instructionText}</p>
+      <ol class="instruction-list">
+        ${stepsListHTML}
+      </ol>
     </div>
   `;
 }
 
 
 // =========================================================
-// 7. ZURÜCK-BUTTONS
+// 8. ZURÜCK-BUTTONS
 // =========================================================
 btnBackTo1.addEventListener('click', () => {
   step2.classList.add('hidden');
@@ -472,9 +516,10 @@ btnBackTo1.addEventListener('click', () => {
 
 btnBackTo2.addEventListener('click', () => {
   step3.classList.add('hidden');
-  if (cameFromRandom) {
-    step1.classList.remove('hidden');
-  } else {
-    step2.classList.remove('hidden');
-  }
+  step2.classList.remove('hidden');
+});
+
+btnBackToStartFromRandom.addEventListener('click', () => {
+  step3.classList.add('hidden');
+  step1.classList.remove('hidden');
 });

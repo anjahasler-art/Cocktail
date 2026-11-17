@@ -215,11 +215,15 @@ input.valid {
   margin-bottom: 5px;
 }
 
-/* Fließtext-Anleitung (wie im Englischen, ohne Punkt-Zerstückelung) */
-.instruction-text {
-  line-height: 1.6;
+/* Nummerierte Schritt-für-Schritt Anleitung */
+.instruction-list {
   background-color: #f9f9f9;
-  padding: 14px;
+  padding: 14px 16px 14px 34px;
   border-radius: 6px;
+  line-height: 1.6;
   margin: 0;
+}
+
+.instruction-list li {
+  margin-bottom: 8px;
 }
