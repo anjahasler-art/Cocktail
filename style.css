@@ -191,6 +191,7 @@ input.valid {
   margin-bottom: 10px;
   background: linear-gradient(135deg, #ff4b72, #ff8547);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
