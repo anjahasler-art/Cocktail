@@ -2,8 +2,7 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <title>Minimales Cocktail-Formular</title>
-  <!-- Verknüpfung mit der CSS-Datei -->
+  <title>Cocktail-Finder</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -13,31 +12,37 @@
 
       <!-- ==================== SCHRITT 1 ==================== -->
       <div id="step1" class="step">
-        <h2>Schritt 1: Suchart wählen</h2>
+        
+        <!-- Kopfzeile mit Titel und kleinem Sprach-Button -->
+        <div class="step-header">
+          <h2 data-i18n="step1Title">Schritt 1: Suche</h2>
+          <button type="button" id="btnLang" class="btn-lang">🌐 DE</button>
+        </div>
 
-        <!-- Dropdown bestimmt, welches Input-Feld gezeigt wird -->
-        <label for="searchType">Suchen nach:</label>
+        <!-- Dropdown für die Suchart (inkl. Random) -->
+        <label for="searchType" data-i18n="labelSearchType">Suchen nach:</label>
         <select id="searchType">
-          <option value="name">Cocktailname</option>
-          <option value="ingredient">Hauptzutat</option>
+          <option value="name" data-i18n="optName">Cocktailname</option>
+          <option value="ingredient" data-i18n="optIngredient">Hauptzutat</option>
+          <option value="random" data-i18n="optRandom">🎲 Random Cocktail</option>
         </select>
 
         <!-- Eingabefeld A: Name -->
         <div id="groupName">
-          <label for="inputName">Name:</label>
+          <label for="inputName" data-i18n="labelName">Name:</label>
           <input 
             type="text" 
             id="inputName" 
-            placeholder="z. B. French 75"
+            placeholder="z. B. Margarita"
             aria-describedby="feedbackText nameHint"
             aria-invalid="false"
           >
-          <small id="nameHint" class="hint-text">Buchstaben und Zahlen sind gültig (2–30 Zeichen).</small>
+          <small id="nameHint" class="hint-text" data-i18n="hintText">Buchstaben und Zahlen sind gültig (2–30 Zeichen).</small>
         </div>
 
         <!-- Eingabefeld B: Zutat (startet ausgeblendet) -->
         <div id="groupIngredient" class="hidden">
-          <label for="inputIngredient">Zutat:</label>
+          <label for="inputIngredient" data-i18n="labelIngredient">Zutat:</label>
           <input 
             type="text" 
             id="inputIngredient" 
@@ -45,45 +50,58 @@
             aria-describedby="feedbackText ingredientHint"
             aria-invalid="false"
           >
-          <small id="ingredientHint" class="hint-text">Buchstaben und Zahlen sind gültig (2–30 Zeichen).</small>
+          <small id="ingredientHint" class="hint-text" data-i18n="hintText">Buchstaben und Zahlen sind gültig (2–30 Zeichen).</small>
+        </div>
+
+        <!-- Filter für Alkohol / Alkoholfrei (wird bei Random ausgeblendet) -->
+        <div id="groupAlcohol">
+          <label for="alcoholFilter" data-i18n="labelAlcohol">Alkoholgehalt:</label>
+          <select id="alcoholFilter">
+            <option value="all" data-i18n="optAll">Alle anzeigen</option>
+            <option value="Alcoholic" data-i18n="optAlcoholic">Mit Alkohol</option>
+            <option value="Non_Alcoholic" data-i18n="optNonAlcoholic">Alkoholfrei</option>
+          </select>
         </div>
 
         <!-- Text für barrierefreies Validierungs-Feedback -->
         <p id="feedbackText" role="alert" aria-live="polite"></p>
 
-        <button type="button" id="btnStep1">Weiter</button>
+        <button type="button" id="btnStep1" data-i18n="btnNext">Weiter</button>
       </div>
 
       <!-- ==================== SCHRITT 2 ==================== -->
       <div id="step2" class="step hidden">
-        <h2>Schritt 2: Cocktail auswählen</h2>
+        <h2 data-i18n="step2Title">Schritt 2: Cocktail auswählen</h2>
 
-        <!-- Dropdown für die API-Ergebnisse -->
-        <label for="resultsSelect">Ergebnisliste:</label>
-        <select id="resultsSelect">
+        <!-- Live-Suchfeld für schnelle Filterung in der grossen Liste -->
+        <label for="filterResultsInput" data-i18n="labelFilterResults">Liste durchsuchen:</label>
+        <input type="text" id="filterResultsInput" placeholder="Name tippen zum Filtern...">
+
+        <!-- Dropdown für alle API-Ergebnisse -->
+        <label for="resultsSelect" id="resultsCountLabel">Ergebnisliste:</label>
+        <select id="resultsSelect" size="6">
           <option value="">-- Bitte wählen --</option>
         </select>
 
         <div class="button-group">
-          <button type="button" id="btnBackTo1" class="btn-secondary">Zurück</button>
-          <button type="button" id="btnStep2">Rezept anzeigen</button>
+          <button type="button" id="btnBackTo1" class="btn-secondary" data-i18n="btnBack">Zurück</button>
+          <button type="button" id="btnStep2" data-i18n="btnShowRecipe">Rezept anzeigen</button>
         </div>
       </div>
 
       <!-- ==================== SCHRITT 3 ==================== -->
       <div id="step3" class="step hidden">
-        <h2>Schritt 3: Rezept</h2>
+        <h2 data-i18n="step3Title">Schritt 3: Rezept</h2>
         
-        <!-- Hier fügt JS das fertige Ergebnis ein -->
+        <!-- Hier fügt JS Glas, Zutaten und Anleitung ein -->
         <div id="recipeResult"></div>
 
-        <button type="button" id="btnBackTo2" class="btn-secondary">Zurück</button>
+        <button type="button" id="btnBackTo2" class="btn-secondary" data-i18n="btnBack">Zurück</button>
       </div>
 
     </form>
   </main>
 
-  <!-- Verknüpfung mit der JS-Datei (am Ende des body geladen) -->
   <script src="script.js"></script>
 </body>
 </html>
