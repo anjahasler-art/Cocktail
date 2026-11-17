@@ -27,7 +27,6 @@ const btnStep2 = document.getElementById('btnStep2');
 const btnBackTo1 = document.getElementById('btnBackTo1');
 const btnBackTo2 = document.getElementById('btnBackTo2');
 
-// Buttons für Random-Modus in Schritt 3
 const normalStep3Buttons = document.getElementById('normalStep3Buttons');
 const randomStep3Buttons = document.getElementById('randomStep3Buttons');
 const btnAnotherRandom = document.getElementById('btnAnotherRandom');
@@ -37,6 +36,7 @@ const btnBackToStartFromRandom = document.getElementById('btnBackToStartFromRand
 let currentLang = 'de';
 let allFetchedDrinks = [];
 let currentDisplayedDrink = null;
+let cachedFullDatabase = null; // Speichert alle Cocktails der API einmalig für blitzschnelle Zutatensuche
 
 
 // =========================================================
@@ -112,7 +112,6 @@ function setLanguage(lang) {
     updateResultsDropdown(allFetchedDrinks);
   }
 
-  // Wenn wir in Schritt 3 sind, Rezept sofort neu übersetzen & rendern
   if (!step3.classList.contains('hidden') && currentDisplayedDrink) {
     renderRecipe(currentDisplayedDrink);
   }
@@ -121,11 +120,11 @@ function setLanguage(lang) {
 btnLangDE.addEventListener('click', () => setLanguage('de'));
 btnLangEN.addEventListener('click', () => setLanguage('en'));
 
-// Übersetzt englische Texte ins Deutsche (inkl. Mengenangaben wie "oz", "dash", "tsp", "cup")
-async function translateToGerman(text) {
+// Übersetzt Texte zwischen DE und EN
+async function translateText(text, langPair) {
   if (!text || text.trim() === '') return '';
   try {
-    const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|de`);
+    const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${langPair}`);
     const data = await res.json();
     return data.responseData.translatedText || text;
   } catch (e) {
@@ -212,7 +211,35 @@ function resetValidation() {
 
 
 // =========================================================
-// 4. HILFSFUNKTION FÜR RANDOM COCKTAIL
+// 4. HILFSFUNKTION: KOMPLETTE DATENBANK LADEN (FÜR ZUTATEN)
+// =========================================================
+async function getAllCocktailsFromAPI() {
+  if (cachedFullDatabase) return cachedFullDatabase;
+
+  // Alle Buchstaben a-z und Ziffern 1-9 parallel abrufen, damit KEIN Cocktail übersehen wird
+  const chars = 'abcdefghijklmnopqrstuvwxyz123456789'.split('');
+  const requests = chars.map(char =>
+    fetch(`https://www.thecocktaildb.com/api/json/v1/1/search.php?f=${char}`)
+      .then(res => res.json())
+      .catch(() => ({ drinks: null }))
+  );
+
+  const results = await Promise.all(requests);
+  const allDrinks = [];
+
+  results.forEach(res => {
+    if (res.drinks && Array.isArray(res.drinks)) {
+      allDrinks.push(...res.drinks);
+    }
+  });
+
+  cachedFullDatabase = allDrinks;
+  return allDrinks;
+}
+
+
+// =========================================================
+// 5. RANDOM COCKTAIL FUNKTION
 // =========================================================
 async function loadRandomCocktail() {
   try {
@@ -220,7 +247,6 @@ async function loadRandomCocktail() {
     const data = await response.json();
     const randomDrink = data.drinks[0];
 
-    // Buttons für Random-Modus einblenden, normalen Zurück-Button ausblenden
     normalStep3Buttons.classList.add('hidden');
     randomStep3Buttons.classList.remove('hidden');
 
@@ -233,24 +259,20 @@ async function loadRandomCocktail() {
   }
 }
 
-// Klick auf "Anderer Cocktail" in Schritt 3 lädt direkt den nächsten Zufalls-Cocktail
 btnAnotherRandom.addEventListener('click', loadRandomCocktail);
 
 
 // =========================================================
-// 5. SCHRITT 1 -> SCHRITT 2 (INKL. VOLLSTÄNDIGER ZUTATENSUCHE)
+// 6. SCHRITT 1 -> SCHRITT 2 (SUCHE NACH NAME ODER HAUPTZUTAT)
 // =========================================================
 btnStep1.addEventListener('click', async () => {
   const mode = searchType.value;
 
-  // --- FALL A: RANDOM COCKTAIL ---
   if (mode === 'random') {
     await loadRandomCocktail();
     return;
   }
 
-  // --- FALL B: SUCHE NACH NAME ODER HAUPTZUTAT ---
-  // Normale Buttons für Schritt 3 aktivieren
   normalStep3Buttons.classList.remove('hidden');
   randomStep3Buttons.classList.add('hidden');
 
@@ -274,51 +296,33 @@ btnStep1.addEventListener('click', async () => {
         drinks = data.drinks;
       }
     } else {
-      // 2) SUCHE NACH HAUPTZUTAT (Vollständige Suche über alle Sorten!)
-      // Wir holen die Zutatenliste der API PLUS typische Zusätze (Light/Dark/White/Spiced)
-      const listRes = await fetch('https://www.thecocktaildb.com/api/json/v1/1/list.php?i=list');
-      const listData = await listRes.json();
+      // 2) SUCHE NACH HAUPTZUTAT (Durchsucht ALLE Cocktails in allen Zutatenfeldern 1-15!)
+      feedbackText.textContent = currentLang === 'de' ? '⏳ Durchsuche alle Rezepte...' : '⏳ Searching all recipes...';
+      feedbackText.className = '';
 
-      const matchingFromList = listData.drinks
-        .map(item => item.strIngredient1)
-        .filter(ing => ing && ing.toLowerCase().includes(query.toLowerCase()));
+      const allDrinks = await getAllCocktailsFromAPI();
+      const searchLower = query.toLowerCase();
 
-      // Zusätzliche gängige Präfixe kombinieren (da list.php?i=list nicht alle Unterarten enthält!)
-      const extraVariants = [
-        query,
-        `Light ${query}`,
-        `Dark ${query}`,
-        `White ${query}`,
-        `Spiced ${query}`,
-        `Gold ${query}`,
-        `Aged ${query}`,
-        `Sweet ${query}`,
-        `Dry ${query}`
-      ];
+      // Falls auf Deutsch gesucht wird (z.B. "Wein" oder "Zitrone"), übersetzen wir das Suchwort zusätzlich ins Englische
+      let searchEnglishLower = searchLower;
+      if (currentLang === 'de') {
+        const translatedQuery = await translateText(query, 'de|en');
+        searchEnglishLower = translatedQuery.toLowerCase().trim();
+      }
 
-      // Alle Suchbegriffe ohne Duplikate zusammenfassen
-      const allIngredientQueries = Array.from(new Set([...matchingFromList, ...extraVariants]));
-
-      // Alle Zutaten-Varianten parallel abfragen
-      const requests = allIngredientQueries.map(ing =>
-        fetch(`https://www.thecocktaildb.com/api/json/v1/1/filter.php?i=${encodeURIComponent(ing)}`)
-          .then(res => res.json())
-          .catch(() => ({ drinks: null }))
-      );
-
-      const results = await Promise.all(requests);
-
-      // Alle gefundenen Cocktails zusammenführen und Duplikate entfernen
-      const uniqueDrinksMap = new Map();
-      results.forEach(res => {
-        if (res.drinks && Array.isArray(res.drinks)) {
-          res.drinks.forEach(drink => {
-            uniqueDrinksMap.set(drink.idDrink, drink);
-          });
+      // Alle Cocktails herausfiltern, bei denen die Zutat in strIngredient1 bis strIngredient15 vorkommt
+      drinks = allDrinks.filter(drink => {
+        for (let i = 1; i <= 15; i++) {
+          const ing = drink[`strIngredient${i}`];
+          if (ing) {
+            const ingLower = ing.toLowerCase();
+            if (ingLower.includes(searchLower) || ingLower.includes(searchEnglishLower)) {
+              return true;
+            }
+          }
         }
+        return false;
       });
-
-      drinks = Array.from(uniqueDrinksMap.values());
     }
 
     if (drinks.length === 0) {
@@ -331,14 +335,8 @@ btnStep1.addEventListener('click', async () => {
 
     // Alkohol-Filter anwenden
     if (selectedAlcohol !== 'all') {
-      if (isNameMode) {
-        drinks = drinks.filter(d => d.strAlcoholic === (selectedAlcohol === 'Alcoholic' ? 'Alcoholic' : 'Non alcoholic'));
-      } else {
-        const alcRes = await fetch(`https://www.thecocktaildb.com/api/json/v1/1/filter.php?a=${selectedAlcohol}`);
-        const alcData = await alcRes.json();
-        const allowedIds = new Set(alcData.drinks.map(d => d.idDrink));
-        drinks = drinks.filter(d => allowedIds.has(d.idDrink));
-      }
+      const targetAlcohol = selectedAlcohol === 'Alcoholic' ? 'Alcoholic' : 'Non alcoholic';
+      drinks = drinks.filter(d => d.strAlcoholic === targetAlcohol);
     }
 
     if (drinks.length === 0) {
@@ -349,10 +347,13 @@ btnStep1.addEventListener('click', async () => {
       return;
     }
 
+    // Feedback-Text wieder leeren
+    feedbackText.textContent = '';
+
     // Alphabetisch sortieren (A - Z) für Kompetenz E4
     drinks.sort((a, b) => a.strDrink.localeCompare(b.strDrink));
 
-    // Alle gefundenen Cocktails speichern und ins klassische Dropdown füllen
+    // Alle gefundenen Cocktails speichern und ins Dropdown füllen
     allFetchedDrinks = drinks;
     updateResultsDropdown(allFetchedDrinks);
 
@@ -367,7 +368,7 @@ btnStep1.addEventListener('click', async () => {
 
 
 // =========================================================
-// 6. SCHRITT 2: ALLE COCKTAILS IM DROPDOWN ANZEIGEN
+// 7. SCHRITT 2: ALLE COCKTAILS IM DROPDOWN ANZEIGEN
 // =========================================================
 function updateResultsDropdown(drinksList) {
   resultsSelect.innerHTML = `<option value="">${translations[currentLang].selectDefault}</option>`;
@@ -386,7 +387,7 @@ function updateResultsDropdown(drinksList) {
 
 
 // =========================================================
-// 7. SCHRITT 2 -> SCHRITT 3 (REZEPT MIT ÜBERSETZUNG & NUMMERIERUNG)
+// 8. SCHRITT 2 -> SCHRITT 3 (REZEPT MIT ÜBERSETZUNG & NUMMERIERUNG)
 // =========================================================
 btnStep2.addEventListener('click', async () => {
   const drinkId = resultsSelect.value;
@@ -397,9 +398,13 @@ btnStep2.addEventListener('click', async () => {
   }
 
   try {
-    const response = await fetch(`https://www.thecocktaildb.com/api/json/v1/1/lookup.php?i=${drinkId}`);
-    const data = await response.json();
-    const drink = data.drinks[0];
+    // Falls wir den Cocktail schon komplett im Speicher haben, direkt nehmen, sonst per lookup.php laden
+    let drink = allFetchedDrinks.find(d => d.idDrink === drinkId);
+    if (!drink || !drink.strInstructions) {
+      const response = await fetch(`https://www.thecocktaildb.com/api/json/v1/1/lookup.php?i=${drinkId}`);
+      const data = await response.json();
+      drink = data.drinks[0];
+    }
 
     step2.classList.add('hidden');
     step3.classList.remove('hidden');
@@ -409,7 +414,6 @@ btnStep2.addEventListener('click', async () => {
   }
 });
 
-// Baut das Rezept zusammen (Glas -> Zutaten inkl. übersetzter Mengen -> nummerierte Anleitung)
 async function renderRecipe(drink) {
   currentDisplayedDrink = drink;
 
@@ -434,26 +438,21 @@ async function renderRecipe(drink) {
   let instructionText = drink.strInstructions || '';
 
   if (currentLang === 'de') {
-    // Glas übersetzen
-    glassText = await translateToGerman(glassText);
+    glassText = await translateText(glassText, 'en|de');
 
-    // Anleitung: Prüfen ob deutsche Version existiert, sonst übersetzen
     if (drink.strInstructionsDE && drink.strInstructionsDE.trim() !== '') {
       instructionText = drink.strInstructionsDE;
     } else {
-      instructionText = await translateToGerman(instructionText);
+      instructionText = await translateText(instructionText, 'en|de');
     }
 
-    // Zutatennamen UND Mengenangaben zusammen übersetzen
     if (rawIngredients.length > 0) {
-      // Mengenangaben übersetzen (z.B. "1 oz" -> "1 Unze", "1 dash" -> "1 Spritzer")
       const amountsToTranslate = rawIngredients.map(item => item.amount || '-').join(' | ');
-      const translatedAmountsRaw = await translateToGerman(amountsToTranslate);
+      const translatedAmountsRaw = await translateText(amountsToTranslate, 'en|de');
       const translatedAmounts = translatedAmountsRaw.split('|').map(s => s.trim());
 
-      // Zutatennamen übersetzen
       const namesToTranslate = rawIngredients.map(item => item.name).join(' | ');
-      const translatedNamesRaw = await translateToGerman(namesToTranslate);
+      const translatedNamesRaw = await translateText(namesToTranslate, 'en|de');
       const translatedNames = translatedNamesRaw.split('|').map(s => s.trim());
 
       rawIngredients.forEach((item, index) => {
@@ -467,7 +466,6 @@ async function renderRecipe(drink) {
     }
   }
 
-  // Zutatenliste als HTML aufbauen
   const ingredientsHTML = rawIngredients
     .map(item => `<li><strong>${item.amount}</strong> ${item.name}</li>`)
     .join('');
@@ -507,7 +505,7 @@ async function renderRecipe(drink) {
 
 
 // =========================================================
-// 8. ZURÜCK-BUTTONS
+// 9. ZURÜCK-BUTTONS
 // =========================================================
 btnBackTo1.addEventListener('click', () => {
   step2.classList.add('hidden');
