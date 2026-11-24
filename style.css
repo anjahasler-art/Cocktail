@@ -26,7 +26,7 @@ body {
   max-width: 520px;
 }
 
-/* Tiefschwarze Hauptkarte ohne Schatten/Glow */
+/* Tiefschwarze Hauptkarte */
 .form-card {
   background-color: #09090b;
   border: 1px solid #26262f;
@@ -34,11 +34,24 @@ body {
   padding: 25px 30px 30px 30px;
 }
 
-/* === DAUERHAFTER SPRACH-SWITCH OBEN RECHTS === */
+/* === KOPFZEILE MIT STARTSEITE-LINK & SPRACH-SWITCH === */
 .top-bar {
   display: flex;
-  justify-content: flex-end;
-  margin-bottom: 10px;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.home-link {
+  color: #a1a1aa;
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.home-link:hover {
+  color: #ff8577;
 }
 
 .lang-switch {
@@ -73,7 +86,18 @@ body {
   color: #ffffff;
 }
 
-/* Überschriften */
+/* Schritt-Kopfzeile mit Tooltip / Modal-Pill */
+.step-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.step-header h2 {
+  margin: 0;
+}
+
 .step h2 {
   margin-top: 0;
   margin-bottom: 20px;
@@ -114,7 +138,7 @@ input[type="text"]:focus, select:focus {
 }
 
 /* Haupt-Buttons */
-button:not(.lang-btn) {
+button:not(.lang-btn):not(.tooltip-trigger):not(.btn-info-pill):not(.modal-close) {
   width: 100%;
   padding: 12px;
   font-size: 1rem;
@@ -128,7 +152,7 @@ button:not(.lang-btn) {
   margin-top: 10px;
 }
 
-button:not(.lang-btn):hover {
+button:not(.lang-btn):not(.tooltip-trigger):not(.btn-info-pill):not(.modal-close):hover {
   filter: brightness(1.08);
   transform: translateY(-1px);
 }
@@ -146,6 +170,143 @@ button.btn-secondary {
 
 button.btn-secondary:hover {
   background: #25252e;
+}
+
+/* === E6 KOMPONENTE 1: TOOLTIP === */
+.tooltip-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 0;
+}
+
+.tooltip-trigger {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background-color: #16161a;
+  border: 1px solid #ff5566;
+  color: #ff8577;
+  font-weight: 800;
+  font-size: 0.85rem;
+  cursor: help;
+}
+
+.tooltip-box {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  bottom: 135%;
+  right: 0;
+  width: 240px;
+  background-color: #18181d;
+  color: #f4f4f5;
+  border: 1px solid #ff5566;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  z-index: 50;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.tooltip-wrapper:hover .tooltip-box,
+.tooltip-wrapper:focus-within .tooltip-box {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* === E6 KOMPONENTE 3: MODAL === */
+.btn-info-pill {
+  background-color: #16161a;
+  border: 1px solid #ff5566;
+  color: #ff8577;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.btn-info-pill:hover {
+  background-color: #222229;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.78);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  z-index: 200;
+  margin-bottom: 0;
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 420px;
+  background-color: #09090b;
+  border: 1px solid #ff5566;
+  border-radius: 16px;
+  padding: 22px 24px;
+  margin-bottom: 0;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #ffffff;
+}
+
+.modal-close {
+  background: #18181d;
+  border: 1px solid #2e2e36;
+  color: #d4d4d8;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.modal-close:hover {
+  color: #ffffff;
+  border-color: #ff5566;
+}
+
+.modal-desc {
+  font-size: 0.9rem;
+  color: #a1a1aa;
+  line-height: 1.45;
+  margin: 0 0 14px 0;
+}
+
+.modal-list {
+  background-color: #141418;
+  border-left: 4px solid #ff5566;
+  padding: 12px 14px 12px 28px;
+  border-radius: 6px;
+  margin: 0;
+  color: #e4e4e7;
+  font-size: 0.92rem;
+}
+
+.modal-list li {
+  margin-bottom: 6px;
+}
+
+.modal-list strong {
+  color: #ff8066;
 }
 
 /* === VISUELLES FEEDBACK (E2) === */

@@ -38,7 +38,6 @@
       border: 1px solid #2e2e36;
       border-radius: 24px;
       padding: 4px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
     }
 
     .lang-btn {
@@ -56,10 +55,9 @@
     .lang-btn.active {
       background: linear-gradient(135deg, #ff416c, #ff7b39);
       color: #ffffff;
-      box-shadow: 0 4px 14px rgba(255, 65, 108, 0.4);
     }
 
-    /* Hauptcontainer mit mehr Abstand oben */
+    /* Hauptcontainer */
     .container {
       position: relative;
       z-index: 1;
@@ -123,13 +121,12 @@
       color: #ffffff;
     }
 
-    /* Platzhalter-Karte für euer Foto */
+    /* Foto-Karte */
     .photo-card {
       position: relative;
       border-radius: 24px;
       padding: 4px;
       background: linear-gradient(135deg, #ff416c, #ff7b39);
-      box-shadow: 0 20px 50px rgba(255, 65, 108, 0.22);
       transform: rotate(1.5deg);
       transition: transform 0.35s ease;
     }
@@ -173,13 +170,13 @@
       font-weight: 600;
     }
 
-    /* 2. KOMPAKTES COCKTAILGLAS + FREIE ERKLÄRUNGSTEXTE */
+    /* 2. COCKTAILGLAS + ERKLÄRUNGSTEXTE */
     .showcase-grid {
       display: grid;
       grid-template-columns: 0.95fr 1.05fr;
       gap: 40px;
       align-items: center;
-      margin-bottom: 56px;
+      margin-bottom: 64px;
     }
 
     .glass-sticky-column {
@@ -197,14 +194,12 @@
       width: 340px;
       height: 410px;
       display: block;
-      cursor: grab;
     }
 
-    /* Rechts: Freie Erklärungstexte */
     .story-column {
       display: flex;
       flex-direction: column;
-      gap: 48px;
+      gap: 44px;
       padding: 12px 0;
     }
 
@@ -227,6 +222,10 @@
       line-height: 1.12;
       color: #ffffff;
       margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
     }
 
     .story-block p {
@@ -235,7 +234,124 @@
       line-height: 1.55;
     }
 
-    /* 3. MARKANTER, GROSSER START-BUTTON AM SCHLUSS */
+    /* === E6 KOMPONENTE 1: TOOLTIP === */
+    .tooltip-wrapper {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .tooltip-trigger {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background-color: #18181d;
+      border: 1px solid #ff416c;
+      color: #ff8577;
+      font-size: 0.82rem;
+      font-weight: 900;
+      cursor: help;
+    }
+
+    .tooltip-box {
+      visibility: hidden;
+      opacity: 0;
+      position: absolute;
+      bottom: 135%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 250px;
+      background-color: #18181d;
+      color: #f4f4f5;
+      border: 1px solid #ff5566;
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 0.84rem;
+      font-weight: 500;
+      line-height: 1.4;
+      z-index: 50;
+      transition: opacity 0.2s ease, visibility 0.2s ease;
+      pointer-events: none;
+    }
+
+    .tooltip-wrapper:hover .tooltip-box,
+    .tooltip-wrapper:focus-within .tooltip-box {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    /* === E6 KOMPONENTE 2: ACCORDION (FAQ) === */
+    .faq-section {
+      max-width: 780px;
+      margin: 0 auto 56px auto;
+    }
+
+    .faq-heading {
+      text-align: center;
+      font-size: 1.75rem;
+      font-weight: 900;
+      margin-bottom: 20px;
+      color: #ffffff;
+    }
+
+    .accordion-item {
+      background-color: #141418;
+      border: 1px solid #26262f;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      overflow: hidden;
+    }
+
+    .accordion-header {
+      width: 100%;
+      background: transparent;
+      border: none;
+      color: #ffffff;
+      padding: 16px 20px;
+      font-size: 1.02rem;
+      font-weight: 700;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background-color 0.2s ease;
+    }
+
+    .accordion-header:hover {
+      background-color: #1a1a20;
+    }
+
+    .accordion-icon {
+      color: #ff7b39;
+      font-size: 1.25rem;
+      font-weight: 900;
+      transition: transform 0.25s ease;
+    }
+
+    .accordion-item.open .accordion-icon {
+      transform: rotate(45deg);
+    }
+
+    .accordion-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.28s ease, padding 0.28s ease;
+      padding: 0 20px;
+      color: #a1a1aa;
+      font-size: 0.96rem;
+      line-height: 1.55;
+    }
+
+    .accordion-item.open .accordion-body {
+      max-height: 180px;
+      padding: 0 20px 18px 20px;
+    }
+
+    /* 3. MARKANTER START-BUTTON AM SCHLUSS */
     .cta-section {
       text-align: center;
       padding: 16px;
@@ -254,26 +370,15 @@
       color: #ffffff;
       background: linear-gradient(135deg, #ff416c 0%, #ff7b39 100%);
       border-radius: 60px;
-      box-shadow: 0 0 35px rgba(255, 65, 108, 0.65), 0 15px 35px rgba(0, 0, 0, 0.6);
-      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      animation: pulseGlow 2.5s infinite;
+      transition: transform 0.25s ease, filter 0.25s ease;
     }
 
     .cta-button:hover {
-      transform: scale(1.07) translateY(-4px);
-      box-shadow: 0 0 55px rgba(255, 123, 57, 0.9), 0 20px 45px rgba(0, 0, 0, 0.8);
+      transform: scale(1.04) translateY(-2px);
+      filter: brightness(1.08);
     }
 
-    @keyframes pulseGlow {
-      0%, 100% {
-        box-shadow: 0 0 30px rgba(255, 65, 108, 0.6), 0 15px 35px rgba(0, 0, 0, 0.6);
-      }
-      50% {
-        box-shadow: 0 0 52px rgba(255, 123, 57, 0.85), 0 15px 35px rgba(0, 0, 0, 0.6);
-      }
-    }
-
-    /* Responsive für Tablets & Smartphones */
+    /* Responsive */
     @media (max-width: 900px) {
       .container {
         padding-top: 88px;
@@ -305,7 +410,7 @@
 </head>
 <body>
 
-  <!-- NUR DER SPRACH-SWITCH OBEN RECHTS -->
+  <!-- SPRACH-SWITCH OBEN RECHTS -->
   <div class="floating-lang">
     <div class="lang-switch" role="group" aria-label="Sprache wählen">
       <button type="button" id="btnLangDE" class="lang-btn active">DE</button>
@@ -318,7 +423,7 @@
     <!-- 1. HERO-BEREICH -->
     <section class="hero-grid">
       <div>
-        <span class="badge" data-i18n="badge">🍹 Mixology & Rezepte</span>
+        <span class="badge" data-i18n="badge">🍹 Mixology &amp; Rezepte</span>
         <h1 data-i18n="title">Cocktail-Finder</h1>
         <p class="hero-text" data-i18n="subtitle">
           Dein interaktiver Rezept-Assistent für Mixgetränke aller Art – klassisch oder alkoholfrei, inklusive Zutaten, Glasempfehlung und Schritt-für-Schritt-Anleitung.
@@ -331,11 +436,12 @@
       <div class="photo-card">
         <div class="photo-inner">
           <img 
-            src="lauraanja.png"
+            src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&w=800&q=80" 
             alt="Laura und Anja mit Cocktails"
           >
           <div class="photo-caption">
-            Laura & Anja (die Gs)
+            Laura &amp; Anja (die Gs)
+            <span data-i18n="photoHint">📸 Platzhalter – Euer Foto hier einfügen</span>
           </div>
         </div>
       </div>
@@ -350,7 +456,16 @@
       <div class="story-column">
         <div class="story-block">
           <span class="story-kicker" data-i18n="s1Kicker">Schritt 01</span>
-          <h2 data-i18n="s1Title">Suchart & Filter wählen</h2>
+          <h2>
+            <span data-i18n="s1Title">Suchart &amp; Filter wählen</span>
+            <!-- E6 KOMPONENTE 1: TOOLTIP -->
+            <span class="tooltip-wrapper">
+              <button type="button" class="tooltip-trigger" aria-label="Such-Tipp">i</button>
+              <span class="tooltip-box" data-i18n="s1Tooltip">
+                Tipp: Du kannst auch deutsche Zutatennamen wie „Zitrone“ oder „Erdbeere“ eingeben – die App übersetzt sie automatisch!
+              </span>
+            </span>
+          </h2>
           <p data-i18n="s1Desc">
             Suche gezielt nach deinem Lieblingsdrink, gib eine Zutat aus deinem Vorrat ein oder lass dich vom Zufallsgenerator überraschen – wahlweise mit Alkohol oder komplett alkoholfrei.
           </p>
@@ -366,7 +481,7 @@
 
         <div class="story-block">
           <span class="story-kicker" data-i18n="s3Kicker">Schritt 03</span>
-          <h2 data-i18n="s3Title">Rezept mixen & genießen</h2>
+          <h2 data-i18n="s3Title">Rezept mixen &amp; genießen</h2>
           <p data-i18n="s3Desc">
             Du erhältst sofort das fertige Rezept mit Foto, passender Glasempfehlung, genauen Mengenangaben und nummerierter Schritt-für-Schritt-Anleitung auf Deutsch oder Englisch.
           </p>
@@ -374,7 +489,42 @@
       </div>
     </section>
 
-    <!-- 3. HERAUSSTECHENDER START-BUTTON -->
+    <!-- E6 KOMPONENTE 2: ACCORDION (HÄUFIGE FRAGEN) -->
+    <section class="faq-section" aria-label="Häufige Fragen">
+      <h2 class="faq-heading" data-i18n="faqHeading">Häufige Fragen (FAQ)</h2>
+
+      <div class="accordion-item">
+        <button type="button" class="accordion-header" aria-expanded="false">
+          <span data-i18n="faq1Q">Woher stammen die Cocktail-Rezepte?</span>
+          <span class="accordion-icon">+</span>
+        </button>
+        <div class="accordion-body">
+          <p data-i18n="faq1A">Alle Rezepte, Bilder und Glasempfehlungen werden live über die offizielle TheCocktailDB-API abgerufen und bei Bedarf automatisch ins Deutsche übersetzt.</p>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <button type="button" class="accordion-header" aria-expanded="false">
+          <span data-i18n="faq2Q">Werden amerikanische Einheiten wie „oz“ umgerechnet?</span>
+          <span class="accordion-icon">+</span>
+        </button>
+        <div class="accordion-body">
+          <p data-i18n="faq2A">Ja! Wenn die Sprache auf Deutsch steht, rechnet unsere App Angaben wie oz, tsp, tbsp oder cups automatisch in Milliliter (ml), Teelöffel (TL) und Esslöffel (EL) um.</p>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <button type="button" class="accordion-header" aria-expanded="false">
+          <span data-i18n="faq3Q">Kann ich auch gezielt alkoholfreie Mocktails suchen?</span>
+          <span class="accordion-icon">+</span>
+        </button>
+        <div class="accordion-body">
+          <p data-i18n="faq3A">Ja, in Schritt 1 kannst du über den Filter „Alkoholgehalt“ direkt auswählen, ob dir alle Drinks, nur alkoholische oder nur alkoholfreie Rezepte angezeigt werden sollen.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. START-BUTTON -->
     <section class="cta-section">
       <a href="index.html" class="cta-button" data-i18n="ctaBtn">
         Jetzt starten →
@@ -390,6 +540,26 @@
     const ctx = canvas.getContext('2d');
     const showcaseSection = document.getElementById('showcaseSection');
 
+    // E6: Accordion-Logik
+    document.querySelectorAll('.accordion-header').forEach(header => {
+      header.addEventListener('click', () => {
+        const item = header.parentElement;
+        const isOpen = item.classList.contains('open');
+
+        // Alle anderen schließen
+        document.querySelectorAll('.accordion-item').forEach(el => {
+          el.classList.remove('open');
+          el.querySelector('.accordion-header').setAttribute('aria-expanded', 'false');
+        });
+
+        // Aktuelles öffnen, falls es geschlossen war
+        if (!isOpen) {
+          item.classList.add('open');
+          header.setAttribute('aria-expanded', 'true');
+        }
+      });
+    });
+
     const translations = {
       de: {
         badge: '🍹 Mixology & Rezepte',
@@ -399,6 +569,7 @@
         photoHint: '📸 Platzhalter – Euer Foto hier einfügen',
         s1Kicker: 'Schritt 01',
         s1Title: 'Suchart & Filter wählen',
+        s1Tooltip: 'Tipp: Du kannst auch deutsche Zutatennamen wie „Zitrone“ oder „Erdbeere“ eingeben – die App übersetzt sie automatisch!',
         s1Desc: 'Suche gezielt nach deinem Lieblingsdrink, gib eine Zutat aus deinem Vorrat ein oder lass dich vom Zufallsgenerator überraschen – wahlweise mit Alkohol oder komplett alkoholfrei.',
         s2Kicker: 'Schritt 02',
         s2Title: 'Cocktail aus der Liste wählen',
@@ -406,6 +577,13 @@
         s3Kicker: 'Schritt 03',
         s3Title: 'Rezept mixen & genießen',
         s3Desc: 'Du erhältst sofort das fertige Rezept mit Foto, passender Glasempfehlung, genauen Mengenangaben und nummerierter Schritt-für-Schritt-Anleitung auf Deutsch oder Englisch.',
+        faqHeading: 'Häufige Fragen (FAQ)',
+        faq1Q: 'Woher stammen die Cocktail-Rezepte?',
+        faq1A: 'Alle Rezepte, Bilder und Glasempfehlungen werden live über die offizielle TheCocktailDB-API abgerufen und bei Bedarf automatisch ins Deutsche übersetzt.',
+        faq2Q: 'Werden amerikanische Einheiten wie „oz“ umgerechnet?',
+        faq2A: 'Ja! Wenn die Sprache auf Deutsch steht, rechnet unsere App Angaben wie oz, tsp, tbsp oder cups automatisch in Milliliter (ml), Teelöffel (TL) und Esslöffel (EL) um.',
+        faq3Q: 'Kann ich auch gezielt alkoholfreie Mocktails suchen?',
+        faq3A: 'Ja, in Schritt 1 kannst du über den Filter „Alkoholgehalt“ direkt auswählen, ob dir alle Drinks, nur alkoholische oder nur alkoholfreie Rezepte angezeigt werden sollen.',
         ctaBtn: 'Jetzt starten →'
       },
       en: {
@@ -416,6 +594,7 @@
         photoHint: '📸 Placeholder – Insert your photo here',
         s1Kicker: 'Step 01',
         s1Title: 'Choose search mode & filter',
+        s1Tooltip: 'Tip: You can search by drink name, any single ingredient at home, or use the random button!',
         s1Desc: 'Search for your favorite drink, enter an ingredient you already have at home, or let the random generator surprise you – alcoholic or non-alcoholic.',
         s2Kicker: 'Step 02',
         s2Title: 'Pick a cocktail from the list',
@@ -423,6 +602,13 @@
         s3Kicker: 'Step 03',
         s3Title: 'Mix & enjoy your recipe',
         s3Desc: 'Instantly get the full recipe with photo, glass recommendation, exact measurements, and numbered step-by-step instructions in English or German.',
+        faqHeading: 'Frequently Asked Questions (FAQ)',
+        faq1Q: 'Where do the cocktail recipes come from?',
+        faq1A: 'All recipes, photos, and glass recommendations are fetched live from the official TheCocktailDB API and automatically translated when needed.',
+        faq2Q: 'Are US units like "oz" converted?',
+        faq2A: 'Yes! When set to German, our app automatically converts units like oz, tsp, tbsp, and cups into milliliters (ml).',
+        faq3Q: 'Can I specifically search for non-alcoholic mocktails?',
+        faq3A: 'Yes, in Step 1 you can use the alcohol filter to show all drinks, alcoholic drinks only, or non-alcoholic mocktails only.',
         ctaBtn: 'Start Now →'
       }
     };
@@ -442,10 +628,8 @@
     btnLangDE.addEventListener('click', () => setLanguage('de'));
     btnLangEN.addEventListener('click', () => setLanguage('en'));
 
-    // ==========================================================
-    // INTERAKTIVES COCKTAILGLAS MIT REALISTISCHER, COOLE BEWEGUNG
-    // ==========================================================
-    let targetAngle = -0.26; // Startneigung (~ -15 Grad)
+    // Interaktives Cocktailglas
+    let targetAngle = -0.26;
     let currentAngle = -0.26;
     let targetFill = 0.30;
     let currentFill = 0.30;
@@ -468,7 +652,6 @@
       const rawProgress = (windowH * 0.85 - rect.top) / (rect.height + windowH * 0.2);
       const progress = Math.min(Math.max(rawProgress, 0), 1);
 
-      // Ausgewogene, realistische Drehung (-16° über +18° zu 0°)
       targetAngle = -0.28 + Math.sin(progress * Math.PI * 1.1) * 0.45 + progress * 0.28;
       targetShiftX = Math.sin(progress * Math.PI * 1.5) * 16;
       targetFill = 0.30 + progress * 0.58;
@@ -477,7 +660,6 @@
     window.addEventListener('mousemove', (e) => {
       const normX = (e.clientX / window.innerWidth) - 0.5;
       const normY = (e.clientY / window.innerHeight) - 0.5;
-      // Kontrollierte, elegante Reaktion auf Mausbewegung
       mouseOffsetX = normX * 0.32;
       mouseOffsetY = normY * 0.36;
     });
@@ -498,7 +680,7 @@
       ctx.translate(canvas.width / 2 + currentShiftX, canvas.height / 2 + 20 + idleFloatY);
       ctx.rotate(currentAngle);
 
-      // 1. LIMETTENSCHEIBE AM GLASRAND RECHTS
+      // Limettenscheibe
       ctx.save();
       ctx.translate(185, -180);
       ctx.rotate(0.4);
@@ -526,7 +708,7 @@
       }
       ctx.restore();
 
-      // 2. COCKTAILSPIESS & KIRSCHE
+      // Cocktailspiess & Kirsche
       ctx.save();
       ctx.beginPath();
       ctx.moveTo(-60, -20);
@@ -547,7 +729,7 @@
       ctx.fill();
       ctx.restore();
 
-      // 3. FLÜSSIGKEIT IM KELCH (bleibt realistisch waagerecht)
+      // Flüssigkeit
       ctx.save();
       ctx.beginPath();
       ctx.moveTo(-195, -172);
@@ -586,7 +768,7 @@
 
       ctx.restore();
 
-      // 4. GLAS-UMRISS (KELCH, STIEL & STANDFUSS)
+      // Glas-Umriss
       const glassGrad = ctx.createLinearGradient(-200, -180, 200, 60);
       glassGrad.addColorStop(0, 'rgba(255, 255, 255, 0.22)');
       glassGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.03)');

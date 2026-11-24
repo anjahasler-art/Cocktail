@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html lang="de"> 
+<html lang="de">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cocktail-Finder</title>
   <link rel="stylesheet" href="style.css">
 </head>
@@ -12,6 +13,7 @@
 
       <!-- DAUERHAFT SICHTBARER SPRACH-SWITCH OBEN RECHTS -->
       <div class="top-bar">
+        <a href="start.html" class="home-link" data-i18n="homeLink">← Startseite</a>
         <div class="lang-switch" role="group" aria-label="Sprache wählen">
           <button type="button" id="btnLangDE" class="lang-btn active">DE</button>
           <button type="button" id="btnLangEN" class="lang-btn">EN</button>
@@ -20,9 +22,17 @@
 
       <!-- ==================== SCHRITT 1 ==================== -->
       <div id="step1" class="step">
-        <h2 data-i18n="step1Title">Schritt 1: Suche</h2>
+        <div class="step-header">
+          <h2 data-i18n="step1Title">Schritt 1: Suche</h2>
+          <!-- E6 KOMPONENTE 1: TOOLTIP -->
+          <span class="tooltip-wrapper">
+            <button type="button" class="tooltip-trigger" aria-label="Hilfe zur Suche">?</button>
+            <span class="tooltip-box" data-i18n="searchTooltip">
+              Wähle „Cocktailname“ für bekannte Drinks, „Hauptzutat“ für Vorräte oder „Random“ für eine Überraschung.
+            </span>
+          </span>
+        </div>
 
-        <!-- Dropdown für die Suchart -->
         <label for="searchType" data-i18n="labelSearchType">Suchen nach:</label>
         <select id="searchType">
           <option value="name" data-i18n="optName">Cocktailname</option>
@@ -43,7 +53,7 @@
           <small id="nameHint" class="hint-text" data-i18n="hintText">Buchstaben und Zahlen sind gültig (2–30 Zeichen).</small>
         </div>
 
-        <!-- Eingabefeld B: Zutat (startet ausgeblendet) -->
+        <!-- Eingabefeld B: Zutat -->
         <div id="groupIngredient" class="hidden">
           <label for="inputIngredient" data-i18n="labelIngredient">Zutat:</label>
           <input 
@@ -66,7 +76,6 @@
           </select>
         </div>
 
-        <!-- Text für barrierefreies Validierungs-Feedback -->
         <p id="feedbackText" role="alert" aria-live="polite"></p>
 
         <button type="button" id="btnStep1" data-i18n="btnNext">Weiter</button>
@@ -76,7 +85,6 @@
       <div id="step2" class="step hidden">
         <h2 data-i18n="step2Title">Schritt 2: Cocktail auswählen</h2>
 
-        <!-- Klassisches Dropdown für alle gefundenen API-Ergebnisse (ohne extra Suchfeld) -->
         <label for="resultsSelect" id="resultsCountLabel">Ergebnisliste:</label>
         <select id="resultsSelect">
           <option value="">-- Bitte wählen --</option>
@@ -90,17 +98,18 @@
 
       <!-- ==================== SCHRITT 3 ==================== -->
       <div id="step3" class="step hidden">
-        <h2 data-i18n="step3Title">Schritt 3: Rezept</h2>
+        <div class="step-header">
+          <h2 data-i18n="step3Title">Schritt 3: Rezept</h2>
+          <!-- E6 KOMPONENTE 3: MODAL-TRIGGER -->
+          <button type="button" id="btnOpenUnitModal" class="btn-info-pill" data-i18n="btnUnitInfo">📏 Einheiten-Info</button>
+        </div>
         
-        <!-- Hier fügt JS Glas, Zutaten (inkl. übersetzter Mengen) und nummerierte Anleitung ein -->
         <div id="recipeResult"></div>
 
-        <!-- Standard-Zurück-Button (bei normaler Suche) -->
         <div id="normalStep3Buttons">
           <button type="button" id="btnBackTo2" class="btn-secondary" data-i18n="btnBack">Zurück</button>
         </div>
 
-        <!-- Spezial-Buttons nur bei Random Cocktail -->
         <div id="randomStep3Buttons" class="button-group hidden">
           <button type="button" id="btnBackToStartFromRandom" class="btn-secondary" data-i18n="btnNewSearch">Neue Suche</button>
           <button type="button" id="btnAnotherRandom" data-i18n="btnAnotherRandom">🎲 Anderer Cocktail</button>
@@ -109,6 +118,27 @@
 
     </form>
   </main>
+
+  <!-- E6 KOMPONENTE 3: MODAL-FENSTER (EINHEITEN-TABELLE) -->
+  <div id="unitModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modalTitle" data-i18n="modalTitle">📏 Barkeeper-Umrechnung</h3>
+        <button type="button" id="btnCloseUnitModal" class="modal-close" aria-label="Schliessen">✕</button>
+      </div>
+      <p class="modal-desc" data-i18n="modalDesc">
+        Internationale Cocktail-Rezepte verwenden oft US-Einheiten. Auf Deutsch rechnet unsere App diese automatisch für dich um:
+      </p>
+      <ul class="modal-list">
+        <li><strong>1 oz (Ounce)</strong> = ca. 30 ml</li>
+        <li><strong>1 cl (Centiliter)</strong> = 10 ml</li>
+        <li><strong>1 tsp (Teaspoon)</strong> = 5 ml (1 TL)</li>
+        <li><strong>1 tbsp (Tablespoon)</strong> = 15 ml (1 EL)</li>
+        <li><strong>1 Shot</strong> = ca. 45 ml</li>
+        <li><strong>1 Dash</strong> = 1 Spritzer (ca. 1 ml)</li>
+      </ul>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>

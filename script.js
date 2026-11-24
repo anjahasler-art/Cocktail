@@ -32,11 +32,42 @@ const randomStep3Buttons = document.getElementById('randomStep3Buttons');
 const btnAnotherRandom = document.getElementById('btnAnotherRandom');
 const btnBackToStartFromRandom = document.getElementById('btnBackToStartFromRandom');
 
+// E6: Modal-Elemente referenzieren
+const unitModal = document.getElementById('unitModal');
+const btnOpenUnitModal = document.getElementById('btnOpenUnitModal');
+const btnCloseUnitModal = document.getElementById('btnCloseUnitModal');
+
 // Globale Variablen
 let currentLang = 'de';
 let allFetchedDrinks = [];
 let currentDisplayedDrink = null;
-let cachedFullDatabase = null; // Speichert alle Cocktails der API einmalig für blitzschnelle Zutatensuche
+let cachedFullDatabase = null;
+
+
+// =========================================================
+// E6 KOMPONENTE 3: MODAL ÖFFNEN & SCHLIESSEN
+// =========================================================
+btnOpenUnitModal.addEventListener('click', () => {
+  unitModal.classList.remove('hidden');
+});
+
+btnCloseUnitModal.addEventListener('click', () => {
+  unitModal.classList.add('hidden');
+});
+
+// Schliessen bei Klick auf den dunklen Hintergrund
+unitModal.addEventListener('click', (e) => {
+  if (e.target === unitModal) {
+    unitModal.classList.add('hidden');
+  }
+});
+
+// Schliessen mit ESC-Taste
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && !unitModal.classList.contains('hidden')) {
+    unitModal.classList.add('hidden');
+  }
+});
 
 
 // =========================================================
@@ -44,7 +75,9 @@ let cachedFullDatabase = null; // Speichert alle Cocktails der API einmalig für
 // =========================================================
 const translations = {
   de: {
+    homeLink: '← Startseite',
     step1Title: 'Schritt 1: Suche',
+    searchTooltip: 'Wähle „Cocktailname“ für bekannte Drinks, „Hauptzutat“ für Vorräte oder „Random“ für eine Überraschung.',
     labelSearchType: 'Suchen nach:',
     optName: 'Cocktailname',
     optIngredient: 'Hauptzutat',
@@ -62,6 +95,9 @@ const translations = {
     btnBack: 'Zurück',
     btnShowRecipe: 'Rezept anzeigen',
     step3Title: 'Schritt 3: Rezept',
+    btnUnitInfo: '📏 Einheiten-Info',
+    modalTitle: '📏 Barkeeper-Umrechnung',
+    modalDesc: 'Internationale Cocktail-Rezepte verwenden oft US-Einheiten. Auf Deutsch rechnet unsere App diese automatisch für dich um:',
     glassTitle: 'Benötigtes Glas:',
     ingredientsTitle: 'Zutaten:',
     instructionsTitle: 'Schritt-für-Schritt Anleitung:',
@@ -69,7 +105,9 @@ const translations = {
     btnNewSearch: 'Neue Suche'
   },
   en: {
+    homeLink: '← Home',
     step1Title: 'Step 1: Search',
+    searchTooltip: 'Choose "Cocktail Name" for specific drinks, "Main Ingredient" for what you have at home, or "Random" for a surprise.',
     labelSearchType: 'Search by:',
     optName: 'Cocktail Name',
     optIngredient: 'Main Ingredient',
@@ -87,6 +125,9 @@ const translations = {
     btnBack: 'Back',
     btnShowRecipe: 'Show Recipe',
     step3Title: 'Step 3: Recipe',
+    btnUnitInfo: '📏 Unit Guide',
+    modalTitle: '📏 Bartender Unit Guide',
+    modalDesc: 'International cocktail recipes often use US measurements. When switched to German, our app converts them automatically:',
     glassTitle: 'Required Glass:',
     ingredientsTitle: 'Ingredients:',
     instructionsTitle: 'Step-by-Step Instructions:',
@@ -136,7 +177,6 @@ async function translateText(text, langPair) {
 function convertToMetric(amountStr) {
   if (!amountStr) return '';
 
-  // Hilfsfunktion: Wandelt Zahlen & Brüche (z. B. "1/2", "1 1/2", "1.5") in eine Dezimalzahl um
   const parseNumber = (numStr) => {
     const parts = numStr.trim().split(/\s+/);
     let total = 0;
@@ -151,7 +191,6 @@ function convertToMetric(amountStr) {
     return total;
   };
 
-  // Sucht nach einer Zahl/einem Bruch gefolgt von einer englischen Einheit und rechnet sie exakt in ml (bzw. TL/EL) um
   return amountStr.replace(
     /(\d+\s+\d+\/\d+|\d+\/\d+|\d+(?:[.,]\d+)?)\s*(fl\.?\s*oz|oz|ounces?|tsp|teaspoons?|tbsp|tablespoons?|cups?|shots?|pints?|quarts?|cl)\b/gi,
     (match, numStr, unit) => {
@@ -160,28 +199,28 @@ function convertToMetric(amountStr) {
 
       const u = unit.toLowerCase().replace(/\./g, '').replace(/\s+/g, '');
       if (u === 'oz' || u === 'floz' || u === 'ounce' || u === 'ounces') {
-        return `${Math.round(val * 30)} ml`; // 1 oz ≈ 30 ml
+        return `${Math.round(val * 30)} ml`;
       }
       if (u === 'cl') {
-        return `${Math.round(val * 10)} ml`; // 1 cl = 10 ml
+        return `${Math.round(val * 10)} ml`;
       }
       if (u === 'tsp' || u === 'teaspoon' || u === 'teaspoons') {
-        return `${Math.round(val * 5)} ml (${val} TL)`; // 1 tsp = 5 ml (1 TL)
+        return `${Math.round(val * 5)} ml (${val} TL)`;
       }
       if (u === 'tbsp' || u === 'tablespoon' || u === 'tablespoons') {
-        return `${Math.round(val * 15)} ml (${val} EL)`; // 1 tbsp = 15 ml (1 EL)
+        return `${Math.round(val * 15)} ml (${val} EL)`;
       }
       if (u === 'cup' || u === 'cups') {
-        return `${Math.round(val * 240)} ml`; // 1 cup ≈ 240 ml
+        return `${Math.round(val * 240)} ml`;
       }
       if (u === 'shot' || u === 'shots') {
-        return `${Math.round(val * 45)} ml`; // 1 shot ≈ 45 ml
+        return `${Math.round(val * 45)} ml`;
       }
       if (u === 'pint' || u === 'pints') {
-        return `${Math.round(val * 473)} ml`; // 1 pint ≈ 473 ml
+        return `${Math.round(val * 473)} ml`;
       }
       if (u === 'quart' || u === 'quarts') {
-        return `${Math.round(val * 946)} ml`; // 1 quart ≈ 946 ml
+        return `${Math.round(val * 946)} ml`;
       }
       return match;
     }
@@ -272,7 +311,6 @@ function resetValidation() {
 async function getAllCocktailsFromAPI() {
   if (cachedFullDatabase) return cachedFullDatabase;
 
-  // Alle Buchstaben a-z und Ziffern 1-9 parallel abrufen, damit KEIN Cocktail übersehen wird
   const chars = 'abcdefghijklmnopqrstuvwxyz123456789'.split('');
   const requests = chars.map(char =>
     fetch(`https://www.thecocktaildb.com/api/json/v1/1/search.php?f=${char}`)
@@ -345,28 +383,24 @@ btnStep1.addEventListener('click', async () => {
     let drinks = [];
 
     if (isNameMode) {
-      // 1) SUCHE NACH COCKTAILNAME
       const response = await fetch(`https://www.thecocktaildb.com/api/json/v1/1/search.php?s=${encodeURIComponent(query)}`);
       const data = await response.json();
       if (data.drinks && Array.isArray(data.drinks)) {
         drinks = data.drinks;
       }
     } else {
-      // 2) SUCHE NACH HAUPTZUTAT (Durchsucht ALLE Cocktails in allen Zutatenfeldern 1-15!)
       feedbackText.textContent = currentLang === 'de' ? '⏳ Durchsuche alle Rezepte...' : '⏳ Searching all recipes...';
       feedbackText.className = '';
 
       const allDrinks = await getAllCocktailsFromAPI();
       const searchLower = query.toLowerCase();
 
-      // Falls auf Deutsch gesucht wird (z.B. "Wein" oder "Zitrone"), übersetzen wir das Suchwort zusätzlich ins Englische
       let searchEnglishLower = searchLower;
       if (currentLang === 'de') {
         const translatedQuery = await translateText(query, 'de|en');
         searchEnglishLower = translatedQuery.toLowerCase().trim();
       }
 
-      // Alle Cocktails herausfiltern, bei denen die Zutat in strIngredient1 bis strIngredient15 vorkommt
       drinks = allDrinks.filter(drink => {
         for (let i = 1; i <= 15; i++) {
           const ing = drink[`strIngredient${i}`];
@@ -389,7 +423,6 @@ btnStep1.addEventListener('click', async () => {
       return;
     }
 
-    // Alkohol-Filter anwenden
     if (selectedAlcohol !== 'all') {
       const targetAlcohol = selectedAlcohol === 'Alcoholic' ? 'Alcoholic' : 'Non alcoholic';
       drinks = drinks.filter(d => d.strAlcoholic === targetAlcohol);
@@ -403,13 +436,10 @@ btnStep1.addEventListener('click', async () => {
       return;
     }
 
-    // Feedback-Text wieder leeren
     feedbackText.textContent = '';
 
-    // Alphabetisch sortieren (A - Z) für Kompetenz E4
     drinks.sort((a, b) => a.strDrink.localeCompare(b.strDrink));
 
-    // Alle gefundenen Cocktails speichern und ins Dropdown füllen
     allFetchedDrinks = drinks;
     updateResultsDropdown(allFetchedDrinks);
 
@@ -454,7 +484,6 @@ btnStep2.addEventListener('click', async () => {
   }
 
   try {
-    // Falls wir den Cocktail schon komplett im Speicher haben, direkt nehmen, sonst per lookup.php laden
     let drink = allFetchedDrinks.find(d => d.idDrink === drinkId);
     if (!drink || !drink.strInstructions) {
       const response = await fetch(`https://www.thecocktaildb.com/api/json/v1/1/lookup.php?i=${drinkId}`);
@@ -477,7 +506,6 @@ async function renderRecipe(drink) {
     recipeResult.innerHTML = '<p>Rezept wird geladen und übersetzt...</p>';
   }
 
-  // 1. ZUTATEN & MENGEN AUSLESEN (1 bis 15)
   let rawIngredients = [];
   for (let i = 1; i <= 15; i++) {
     const ingredient = drink[`strIngredient${i}`];
@@ -489,7 +517,6 @@ async function renderRecipe(drink) {
     }
   }
 
-  // 2. GLAS, MENGEN, ZUTATEN & ANLEITUNG VORBEREITEN
   let glassText = drink.strGlass || 'Standard';
   let instructionText = drink.strInstructions || '';
 
@@ -503,7 +530,6 @@ async function renderRecipe(drink) {
     }
 
     if (rawIngredients.length > 0) {
-      // Vor der Übersetzung alle englischen Einheiten (z. B. "1 1/2 oz", "1 tsp") sauber in metrische Einheiten (ml) umrechnen
       const metricAmounts = rawIngredients.map(item => convertToMetric(item.amount) || '-');
       const amountsToTranslate = metricAmounts.join(' | ');
       const translatedAmountsRaw = await translateText(amountsToTranslate, 'en|de');
@@ -528,7 +554,6 @@ async function renderRecipe(drink) {
     .map(item => `<li><strong>${item.amount}</strong> ${item.name}</li>`)
     .join('');
 
-  // 3. ANLEITUNG IN NUMMERIERTE SCHRITTE AUFSPLITTEN
   const stepsArray = instructionText
     .split('.')
     .map(sentence => sentence.trim())
@@ -538,7 +563,6 @@ async function renderRecipe(drink) {
     .map(step => `<li>${step}.</li>`)
     .join('');
 
-  // 4. ALLES IN SCHRITT 3 ANZEIGEN
   recipeResult.innerHTML = `
     <div class="recipe-card">
       <h3>${drink.strDrink}</h3>
