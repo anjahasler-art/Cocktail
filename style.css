@@ -137,8 +137,8 @@ input[type="text"]:focus, select:focus {
   border-color: #ff5566;
 }
 
-/* Haupt-Buttons */
-button:not(.lang-btn):not(.tooltip-trigger):not(.btn-info-pill):not(.modal-close) {
+/* Haupt-Buttons (Pink-Orange) */
+button:not(.lang-btn):not(.tooltip-trigger):not(.btn-info-pill):not(.modal-close):not(.btn-secondary) {
   width: 100%;
   padding: 12px;
   font-size: 1rem;
@@ -152,7 +152,7 @@ button:not(.lang-btn):not(.tooltip-trigger):not(.btn-info-pill):not(.modal-close
   margin-top: 10px;
 }
 
-button:not(.lang-btn):not(.tooltip-trigger):not(.btn-info-pill):not(.modal-close):hover {
+button:not(.lang-btn):not(.tooltip-trigger):not(.btn-info-pill):not(.modal-close):not(.btn-secondary):hover {
   filter: brightness(1.08);
   transform: translateY(-1px);
 }
@@ -162,14 +162,24 @@ button:not(.lang-btn):not(.tooltip-trigger):not(.btn-info-pill):not(.modal-close
   gap: 10px;
 }
 
+/* Sekundäre Zurück-Buttons (Dunkelgrau) */
 button.btn-secondary {
+  width: 100%;
+  padding: 12px;
+  font-size: 1rem;
+  font-weight: bold;
   background: #1a1a20;
   color: #e4e4e7;
   border: 1px solid #32323d;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background-color 0.2s ease, transform 0.15s ease;
 }
 
 button.btn-secondary:hover {
   background: #25252e;
+  transform: translateY(-1px);
 }
 
 /* === E6 KOMPONENTE 1: TOOLTIP === */
