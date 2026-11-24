@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cocktail-Finder – Laura & Anja</title>
+  <title>Cocktail-Finder – Laura &amp; Anja</title>
   <style>
     * {
       box-sizing: border-box;
@@ -38,6 +38,7 @@
       border: 1px solid #2e2e36;
       border-radius: 24px;
       padding: 4px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
     }
 
     .lang-btn {
@@ -55,6 +56,7 @@
     .lang-btn.active {
       background: linear-gradient(135deg, #ff416c, #ff7b39);
       color: #ffffff;
+      box-shadow: 0 4px 14px rgba(255, 65, 108, 0.4);
     }
 
     /* Hauptcontainer */
@@ -66,13 +68,11 @@
       padding: 84px 24px 68px 24px;
     }
 
-    /* 1. HERO SECTION */
-    .hero-grid {
-      display: grid;
-      grid-template-columns: 1.2fr 0.8fr;
-      gap: 40px;
-      align-items: center;
-      margin-bottom: 64px;
+    /* 1. HERO SECTION (ohne Foto-Karte) */
+    .hero-section {
+      max-width: 780px;
+      margin: 0 auto 64px auto;
+      text-align: center;
     }
 
     .badge {
@@ -105,7 +105,7 @@
       font-size: clamp(1.05rem, 1.4vw, 1.22rem);
       color: #d4d4d8;
       line-height: 1.55;
-      margin-bottom: 18px;
+      margin-bottom: 22px;
     }
 
     .creators-tag {
@@ -114,60 +114,11 @@
       gap: 8px;
       background: linear-gradient(135deg, rgba(255, 65, 108, 0.14), rgba(255, 123, 57, 0.14));
       border: 1px solid rgba(255, 123, 57, 0.45);
-      padding: 10px 16px;
+      padding: 10px 18px;
       border-radius: 12px;
       font-weight: 700;
       font-size: 0.98rem;
       color: #ffffff;
-    }
-
-    /* Foto-Karte */
-    .photo-card {
-      position: relative;
-      border-radius: 24px;
-      padding: 4px;
-      background: linear-gradient(135deg, #ff416c, #ff7b39);
-      transform: rotate(1.5deg);
-      transition: transform 0.35s ease;
-    }
-
-    .photo-card:hover {
-      transform: rotate(0deg) scale(1.02);
-    }
-
-    .photo-inner {
-      background-color: #141418;
-      border-radius: 20px;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .photo-inner img {
-      width: 100%;
-      height: 360px;
-      object-fit: cover;
-      display: block;
-    }
-
-    .photo-caption {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: linear-gradient(to top, rgba(9, 9, 11, 0.95) 20%, transparent);
-      padding: 28px 18px 14px 18px;
-      font-weight: 800;
-      font-size: 1rem;
-      color: #ffffff;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .photo-caption span {
-      font-size: 0.78rem;
-      color: #ff8577;
-      font-weight: 600;
     }
 
     /* 2. COCKTAILGLAS + ERKLÄRUNGSTEXTE */
@@ -194,6 +145,7 @@
       width: 340px;
       height: 410px;
       display: block;
+      cursor: grab;
     }
 
     .story-column {
@@ -351,7 +303,7 @@
       padding: 0 20px 18px 20px;
     }
 
-    /* 3. MARKANTER START-BUTTON AM SCHLUSS */
+    /* 3. MARKANTER, GROSSER START-BUTTON MIT GLOW AM SCHLUSS */
     .cta-section {
       text-align: center;
       padding: 16px;
@@ -370,21 +322,31 @@
       color: #ffffff;
       background: linear-gradient(135deg, #ff416c 0%, #ff7b39 100%);
       border-radius: 60px;
-      transition: transform 0.25s ease, filter 0.25s ease;
+      box-shadow: 0 0 35px rgba(255, 65, 108, 0.65), 0 15px 35px rgba(0, 0, 0, 0.6);
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      animation: pulseGlow 2.5s infinite;
     }
 
     .cta-button:hover {
-      transform: scale(1.04) translateY(-2px);
-      filter: brightness(1.08);
+      transform: scale(1.07) translateY(-4px);
+      box-shadow: 0 0 55px rgba(255, 123, 57, 0.9), 0 20px 45px rgba(0, 0, 0, 0.8);
     }
 
-    /* Responsive */
+    @keyframes pulseGlow {
+      0%, 100% {
+        box-shadow: 0 0 30px rgba(255, 65, 108, 0.6), 0 15px 35px rgba(0, 0, 0, 0.6);
+      }
+      50% {
+        box-shadow: 0 0 52px rgba(255, 123, 57, 0.85), 0 15px 35px rgba(0, 0, 0, 0.6);
+      }
+    }
+
+    /* Responsive für Tablets & Smartphones */
     @media (max-width: 900px) {
       .container {
         padding-top: 88px;
       }
 
-      .hero-grid,
       .showcase-grid {
         grid-template-columns: 1fr;
         gap: 32px;
@@ -398,12 +360,6 @@
 
       .story-column {
         gap: 34px;
-      }
-
-      .photo-card {
-        transform: rotate(0deg);
-        max-width: 440px;
-        margin: 0 auto;
       }
     }
   </style>
@@ -421,29 +377,14 @@
   <main class="container">
 
     <!-- 1. HERO-BEREICH -->
-    <section class="hero-grid">
-      <div>
-        <span class="badge" data-i18n="badge">🍹 Mixology &amp; Rezepte</span>
-        <h1 data-i18n="title">Cocktail-Finder</h1>
-        <p class="hero-text" data-i18n="subtitle">
-          Dein interaktiver Rezept-Assistent für Mixgetränke aller Art – klassisch oder alkoholfrei, inklusive Zutaten, Glasempfehlung und Schritt-für-Schritt-Anleitung.
-        </p>
-        <div class="creators-tag" data-i18n="creators">
-          ✨ Beste Webseite für Cocktails von Laura und Anja (die Gs).
-        </div>
-      </div>
-
-      <div class="photo-card">
-        <div class="photo-inner">
-          <img 
-            src="lauraanja.png" 
-            alt="Laura und Anja mit Cocktails"
-          >
-          <div class="photo-caption">
-            Anja und Laura (die Gs)
-            
-          </div>
-        </div>
+    <section class="hero-section">
+      <span class="badge" data-i18n="badge">🍹 Mixology &amp; Rezepte</span>
+      <h1 data-i18n="title">Cocktail-Finder</h1>
+      <p class="hero-text" data-i18n="subtitle">
+        Dein interaktiver Rezept-Assistent für Mixgetränke aller Art – klassisch oder alkoholfrei, inklusive Zutaten, Glasempfehlung und Schritt-für-Schritt-Anleitung.
+      </p>
+      <div class="creators-tag" data-i18n="creators">
+        ✨ Beste Webseite für Cocktails von Laura und Anja (die Gs).
       </div>
     </section>
 
@@ -524,7 +465,7 @@
       </div>
     </section>
 
-    <!-- 3. START-BUTTON -->
+    <!-- 3. HERAUSSTECHENDER START-BUTTON MIT GLOW -->
     <section class="cta-section">
       <a href="index.html" class="cta-button" data-i18n="ctaBtn">
         Jetzt starten →
@@ -546,13 +487,11 @@
         const item = header.parentElement;
         const isOpen = item.classList.contains('open');
 
-        // Alle anderen schließen
         document.querySelectorAll('.accordion-item').forEach(el => {
           el.classList.remove('open');
           el.querySelector('.accordion-header').setAttribute('aria-expanded', 'false');
         });
 
-        // Aktuelles öffnen, falls es geschlossen war
         if (!isOpen) {
           item.classList.add('open');
           header.setAttribute('aria-expanded', 'true');
@@ -566,7 +505,6 @@
         title: 'Cocktail-Finder',
         subtitle: 'Dein interaktiver Rezept-Assistent für Mixgetränke aller Art – klassisch oder alkoholfrei, inklusive Zutaten, Glasempfehlung und Schritt-für-Schritt-Anleitung.',
         creators: '✨ Beste Webseite für Cocktails von Laura und Anja (die Gs).',
-        photoHint: '📸 Platzhalter – Euer Foto hier einfügen',
         s1Kicker: 'Schritt 01',
         s1Title: 'Suchart & Filter wählen',
         s1Tooltip: 'Tipp: Du kannst auch deutsche Zutatennamen wie „Zitrone“ oder „Erdbeere“ eingeben – die App übersetzt sie automatisch!',
@@ -591,7 +529,6 @@
         title: 'Cocktail-Finder',
         subtitle: 'Your interactive recipe assistant for all kinds of mixed drinks – classic or non-alcoholic, including ingredients, glass recommendations, and step-by-step instructions.',
         creators: '✨ Best website for cocktails by Laura and Anja (the Gs).',
-        photoHint: '📸 Placeholder – Insert your photo here',
         s1Kicker: 'Step 01',
         s1Title: 'Choose search mode & filter',
         s1Tooltip: 'Tip: You can search by drink name, any single ingredient at home, or use the random button!',
