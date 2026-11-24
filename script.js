@@ -132,6 +132,62 @@ async function translateText(text, langPair) {
   }
 }
 
+// Rechnet englische Einheiten (oz, tsp, tbsp, cup, shot, cl, pint, etc.) in metrische Einheiten (ml, TL, EL) um
+function convertToMetric(amountStr) {
+  if (!amountStr) return '';
+
+  // Hilfsfunktion: Wandelt Zahlen & Brüche (z. B. "1/2", "1 1/2", "1.5") in eine Dezimalzahl um
+  const parseNumber = (numStr) => {
+    const parts = numStr.trim().split(/\s+/);
+    let total = 0;
+    for (const part of parts) {
+      if (part.includes('/')) {
+        const [num, den] = part.split('/');
+        if (Number(den) !== 0) total += Number(num) / Number(den);
+      } else {
+        total += Number(part.replace(',', '.'));
+      }
+    }
+    return total;
+  };
+
+  // Sucht nach einer Zahl/einem Bruch gefolgt von einer englischen Einheit und rechnet sie exakt in ml (bzw. TL/EL) um
+  return amountStr.replace(
+    /(\d+\s+\d+\/\d+|\d+\/\d+|\d+(?:[.,]\d+)?)\s*(fl\.?\s*oz|oz|ounces?|tsp|teaspoons?|tbsp|tablespoons?|cups?|shots?|pints?|quarts?|cl)\b/gi,
+    (match, numStr, unit) => {
+      const val = parseNumber(numStr);
+      if (isNaN(val)) return match;
+
+      const u = unit.toLowerCase().replace(/\./g, '').replace(/\s+/g, '');
+      if (u === 'oz' || u === 'floz' || u === 'ounce' || u === 'ounces') {
+        return `${Math.round(val * 30)} ml`; // 1 oz ≈ 30 ml
+      }
+      if (u === 'cl') {
+        return `${Math.round(val * 10)} ml`; // 1 cl = 10 ml
+      }
+      if (u === 'tsp' || u === 'teaspoon' || u === 'teaspoons') {
+        return `${Math.round(val * 5)} ml (${val} TL)`; // 1 tsp = 5 ml (1 TL)
+      }
+      if (u === 'tbsp' || u === 'tablespoon' || u === 'tablespoons') {
+        return `${Math.round(val * 15)} ml (${val} EL)`; // 1 tbsp = 15 ml (1 EL)
+      }
+      if (u === 'cup' || u === 'cups') {
+        return `${Math.round(val * 240)} ml`; // 1 cup ≈ 240 ml
+      }
+      if (u === 'shot' || u === 'shots') {
+        return `${Math.round(val * 45)} ml`; // 1 shot ≈ 45 ml
+      }
+      if (u === 'pint' || u === 'pints') {
+        return `${Math.round(val * 473)} ml`; // 1 pint ≈ 473 ml
+      }
+      if (u === 'quart' || u === 'quarts') {
+        return `${Math.round(val * 946)} ml`; // 1 quart ≈ 946 ml
+      }
+      return match;
+    }
+  );
+}
+
 
 // =========================================================
 // 3. REGULÄRE AUSDRÜCKE & VALIDIERUNG (E2)
@@ -447,7 +503,9 @@ async function renderRecipe(drink) {
     }
 
     if (rawIngredients.length > 0) {
-      const amountsToTranslate = rawIngredients.map(item => item.amount || '-').join(' | ');
+      // Vor der Übersetzung alle englischen Einheiten (z. B. "1 1/2 oz", "1 tsp") sauber in metrische Einheiten (ml) umrechnen
+      const metricAmounts = rawIngredients.map(item => convertToMetric(item.amount) || '-');
+      const amountsToTranslate = metricAmounts.join(' | ');
       const translatedAmountsRaw = await translateText(amountsToTranslate, 'en|de');
       const translatedAmounts = translatedAmountsRaw.split('|').map(s => s.trim());
 
