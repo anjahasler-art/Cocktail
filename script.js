@@ -62,9 +62,9 @@ const translations = {
     btnBack: 'Zurück',
     btnShowRecipe: 'Rezept anzeigen',
     step3Title: 'Schritt 3: Rezept',
-    glassTitle: '🥃 Benötigtes Glas:',
-    ingredientsTitle: '🍋 Zutaten:',
-    instructionsTitle: '📋 Schritt-für-Schritt Anleitung:',
+    glassTitle: 'Benötigtes Glas:',
+    ingredientsTitle: 'Zutaten:',
+    instructionsTitle: 'Schritt-für-Schritt Anleitung:',
     btnAnotherRandom: '🎲 Anderer Cocktail',
     btnNewSearch: 'Neue Suche'
   },
@@ -87,9 +87,9 @@ const translations = {
     btnBack: 'Back',
     btnShowRecipe: 'Show Recipe',
     step3Title: 'Step 3: Recipe',
-    glassTitle: '🥃 Required Glass:',
-    ingredientsTitle: '🍋 Ingredients:',
-    instructionsTitle: '📋 Step-by-Step Instructions:',
+    glassTitle: 'Required Glass:',
+    ingredientsTitle: 'Ingredients:',
+    instructionsTitle: 'Step-by-Step Instructions:',
     btnAnotherRandom: '🎲 Another Cocktail',
     btnNewSearch: 'New Search'
   }
